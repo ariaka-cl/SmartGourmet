@@ -1,0 +1,23 @@
+
+#ignore thumbnails created by windows
+Thumbs.db
+
+#Ignore files build by Visual Studio
+*.user
+*.vs
+*.suo
+*.bak
+*.cache
+*.log
+*.tmp
+*.orig
+*.dat
+*.licx
+*.js.map
+**/Scripts/app/**/*.js
+**/Scripts/app/**/*.js.map
+[Bb]in/
+[Oo]bj/
+
+**/Scripts/app/**/*.js
+**/Scripts/app/**/*.js.map
