@@ -53,6 +53,8 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -71,6 +73,27 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Migrations\201901240313008_InitialCreate.Designer.vb">
+      <DependentUpon>201901240313008_InitialCreate.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201901240313008_InitialCreate.vb" />
+    <Compile Include="Migrations\201901240338499_add_clases.Designer.vb">
+      <DependentUpon>201901240338499_add_clases.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201901240338499_add_clases.vb" />
+    <Compile Include="Migrations\Configuration.vb" />
+    <Compile Include="Model\Categoria.vb" />
+    <Compile Include="Model\Cliente.vb" />
+    <Compile Include="Model\DetallePedido.vb" />
+    <Compile Include="Model\EstadoPedido.vb" />
+    <Compile Include="Model\Funcion.vb" />
+    <Compile Include="Model\Mesa.vb" />
+    <Compile Include="Model\Pedido.vb" />
+    <Compile Include="Model\Producto.vb" />
+    <Compile Include="Model\Rol.vb" />
+    <Compile Include="Model\SGContext.vb" />
+    <Compile Include="Model\TipoEstado.vb" />
+    <Compile Include="Model\Usuario.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -88,6 +111,12 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Migrations\201901240313008_InitialCreate.resx">
+      <DependentUpon>201901240313008_InitialCreate.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901240338499_add_clases.resx">
+      <DependentUpon>201901240338499_add_clases.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
