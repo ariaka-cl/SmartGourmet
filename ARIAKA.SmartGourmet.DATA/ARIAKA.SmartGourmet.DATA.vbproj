@@ -81,7 +81,12 @@
       <DependentUpon>201901240338499_add_clases.vb</DependentUpon>
     </Compile>
     <Compile Include="Migrations\201901240338499_add_clases.vb" />
+    <Compile Include="Migrations\201901240740262_add_clases_2.Designer.vb">
+      <DependentUpon>201901240740262_add_clases_2.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201901240740262_add_clases_2.vb" />
     <Compile Include="Migrations\Configuration.vb" />
+    <Compile Include="Model\Caja.vb" />
     <Compile Include="Model\Categoria.vb" />
     <Compile Include="Model\Cliente.vb" />
     <Compile Include="Model\DetallePedido.vb" />
@@ -89,11 +94,17 @@
     <Compile Include="Model\Funcion.vb" />
     <Compile Include="Model\Mesa.vb" />
     <Compile Include="Model\Pedido.vb" />
+    <Compile Include="Model\Perdidas.vb" />
     <Compile Include="Model\Producto.vb" />
     <Compile Include="Model\Rol.vb" />
     <Compile Include="Model\SGContext.vb" />
+    <Compile Include="Model\StockInicial.vb" />
     <Compile Include="Model\TipoEstado.vb" />
+    <Compile Include="Model\TipoObservacion.vb" />
+    <Compile Include="Model\TipoPago.vb" />
+    <Compile Include="Model\Turno.vb" />
     <Compile Include="Model\Usuario.vb" />
+    <Compile Include="Model\Venta.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -116,6 +127,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201901240338499_add_clases.resx">
       <DependentUpon>201901240338499_add_clases.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901240740262_add_clases_2.resx">
+      <DependentUpon>201901240740262_add_clases_2.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>

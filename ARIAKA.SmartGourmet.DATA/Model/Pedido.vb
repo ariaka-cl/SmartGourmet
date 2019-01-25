@@ -1,5 +1,4 @@
 ﻿Namespace Model
-
     Public Class Pedido
         Public Property ID As Integer
         Public Property Fecha As Date

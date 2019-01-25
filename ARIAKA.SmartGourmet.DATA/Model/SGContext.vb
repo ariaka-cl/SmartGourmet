@@ -19,6 +19,10 @@ Public Class SGContext
     Public Overridable Property DetallePedidos As DbSet(Of DetallePedido)
     Public Overridable Property Categorias As DbSet(Of Categoria)
     Public Overridable Property Productos As DbSet(Of Producto)
+    Public Overridable Property Cajas As DbSet(Of Caja)
+    Public Overridable Property Ventas As DbSet(Of Venta)
+    Public Overridable Property Perdidas As DbSet(Of Perdidas)
+    Public Overridable Property StockInicial As DbSet(Of StockInicial)
 
     Protected Overrides Sub OnModelCreating(modelBuilder As DbModelBuilder)
         MyBase.OnModelCreating(modelBuilder)

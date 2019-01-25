@@ -1,5 +1,4 @@
 ﻿Namespace Model
-
     Public Class Cliente
         Public Property ID As Integer
         Public Property Nombre As String
