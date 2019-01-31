@@ -52,7 +52,6 @@ Namespace Controllers.API
                     End With
                     db.SaveChanges()
                     Return Me.Ok(model)
-
                 End If
 
                 If db.Clientes.Where(Function(t) t.Telefono = model.Telefono).Any Then
@@ -72,14 +71,43 @@ Namespace Controllers.API
                 }
                 db.Clientes.Add(cliente)
                 db.SaveChanges()
-                model.ID = cliente.ID '?
+                model.ID = cliente.ID
                 Return Me.Ok(model)
+
             Catch ex As Exception
                 Return Me.Content(HttpStatusCode.BadRequest, ex.Message)
             Finally
                 db.Dispose()
             End Try
+
         End Function
 
+        <HttpDelete>
+        <Route("{id}", Name:="DeleteCliente")>
+        Public Function DeleteCliente(id As Integer) As IHttpActionResult
+
+            If id = 0 Then
+                Return Me.Content(HttpStatusCode.NotFound, "No se puede eliminar el cliente debido a posibles dependencias asociadas.")
+            End If
+
+            Dim db As New SGContext
+            Try
+                Dim cliente As Cliente = db.Clientes.Where(Function(u) u.ID = id).SingleOrDefault
+
+                If db.Pedidos.Where(Function(p) p.Comprador.ID = cliente.ID).Any() Then
+                    Return Me.Content(HttpStatusCode.BadRequest, String.Format("El cliente {0} {1} no puede eliminarse debido a que tiene pedidos asociados.", cliente.Nombre, cliente.Apellido))
+                End If
+
+                db.Clientes.Remove(cliente)
+                db.SaveChanges()
+                Return Me.Content(HttpStatusCode.OK, String.Format("El cliente {0} {1} fue eliminado.", cliente.Nombre, cliente.Apellido))
+
+            Catch ex As Exception
+                Return Me.Content(HttpStatusCode.BadRequest, ex.Message)
+            Finally
+                db.Dispose()
+            End Try
+
+        End Function
     End Class
 End Namespace

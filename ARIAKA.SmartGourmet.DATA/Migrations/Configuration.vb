@@ -2,10 +2,11 @@ Imports System
 Imports System.Data.Entity
 Imports System.Data.Entity.Migrations
 Imports System.Linq
+Imports ARIAKA.SmartGourmet.DATA.Model
 
 Namespace Migrations
 
-    Friend NotInheritable Class Configuration 
+    Friend NotInheritable Class Configuration
         Inherits DbMigrationsConfiguration(Of SGContext)
 
         Public Sub New()
