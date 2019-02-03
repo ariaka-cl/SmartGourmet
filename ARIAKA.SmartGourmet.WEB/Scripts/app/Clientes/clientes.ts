@@ -10,25 +10,6 @@ namespace Clientes {
         public idRow: KnockoutObservable<number> = ko.observable(0);
         public idRowIndex: KnockoutObservable<number> = ko.observable(-1);
 
-        buttonOptions: DevExpress.ui.dxButtonOptions = {
-            text: "Soy un botón",
-            icon: "plus",
-            onClick: () => {
-                this.getClientes();
-            }
-        }
-
-        //getClientes(): void {
-        //    $.ajax({
-        //        type: 'GET',
-        //        url: 'api/clientes'
-        //    }).done((data: any) => {
-        //        DevExpress.ui.notify("Llamada exitosa", "success", 3000);
-        //        }).fail((data: any) => {
-        //            DevExpress.ui.notify("Error al invocar función", "error", 3000);
-        //        })
-        //}
-
         public limpiarForm() {
             let formData: any = $('#form-clientes').dxForm('option').formData;
             formData.ID = 0;
@@ -93,6 +74,8 @@ namespace Clientes {
                 this.getClientes();
                 let grid = $('#grid-clientes').dxDataGrid('instance');
                 this.limpiarForm();
+                //this.idRow(0);
+                this.enable(true);
                 grid.refresh();
                 grid.repaint();
                 }).fail((data: any) => {
@@ -108,6 +91,8 @@ namespace Clientes {
             }).done((data: any) => {
                 $('#form-clientes').dxForm('instance').resetValues();
                 this.limpiarForm();
+                this.enable(true);
+                DevExpress.ui.notify("Cliente eliminado satisfactoriamente", "success", 3000);
                 }).fail((data: any) => {
                     DevExpress.ui.notify(data.responseJSON, "error", 3000);
                 });
@@ -122,7 +107,7 @@ namespace Clientes {
             labelLocation: "top",
             items: [{
                 itemType: "group",
-                colCount: 3,
+                colCount: 1,
                 items: [{
                     dataField: "Nombre",
                     editorType: "dxTextBox",
@@ -155,18 +140,6 @@ namespace Clientes {
             }]
         };
 
-        buttonOptionsClear: any = {
-            text: "Limpiar",
-            icon: "refresh",
-            type: "default",
-            disabled: this.enable,
-            onClick: () => {
-                $('#form-clientes').dxForm('instance').resetValues();
-                this.limpiarForm();
-                this.idRow(0);
-            }
-        }
-
         buttonOptionsDelete: any = {
             text: "Borrar",
             icon: "remove",
@@ -174,19 +147,8 @@ namespace Clientes {
             disabled: this.enable,
             onClick: () => {
                 let grid = $('#grid-clientes').dxDataGrid('instance');
-                let index = this.idRow();
                 grid.deleteRow(this.idRowIndex());
                 grid.repaint();
-                this.deleteCliente(index);
-            }
-        }
-
-        buttonOptionsAdd: any = {
-            text: "Agregar",
-            icon: "plus",
-            type: 'success',
-            onClick: () => {
-                this.addClientes();
             }
         }
 
@@ -199,18 +161,20 @@ namespace Clientes {
             selection: {
                 mode: "single"
             },
-            columns: [{ dataField: 'ID', visible: false }, 'Nombre', 'Apellido', 'Telefono', 'Direccion'],
+            columns: [{ dataField: 'ID', visible: false }, 'Nombre', 'Apellido', 'Direccion', {dataField: 'Telefono', width: "12%"}],
             editing: {
                 texts: {
-                    confirmDeleteMessage: '¿Esta seguro en eliminar registro?'
+                    confirmDeleteMessage: '¿Esta seguro de eliminar registro de cliente?'
                 }
-            }, grouping: {
+            },
+            onRowRemoved: () => {
+                let index = this.idRow();
+                this.deleteCliente(index);
+            },
+            grouping: {
                 allowCollapsing: true
-            }, groupPanel: {
-                allowColumnDragging: true,
-                visible: true,
-                emptyPanelText: 'Arrastre algunas columnas para agrupar'
-            }, export: {
+            },
+            export: {
                 allowExportSelectedData: true,
                 enabled: true,
                 fileName: 'clientes'
@@ -223,8 +187,15 @@ namespace Clientes {
             , showColumnLines: false
             , filterRow: {
                 visible: true,
-                showOperationChooser: false
-            }, onRowClick: (e) => {
+                showOperationChooser: true,
+                applyFilter: "auto"
+            },
+            searchPanel: {
+                visible: true,
+                width: 240,
+                placeholder: "Buscar..."
+            },
+            onRowClick: (e) => {
                 this.enable(false);
                 let formData: any = $('#form-clientes').dxForm('option');
                 let clienteData: any = {
@@ -240,6 +211,67 @@ namespace Clientes {
                 let form = $('#form-clientes').dxForm('instance');
                 form.repaint();
             }
+        };
+
+        formPopup: any = {
+            visible: false,
+            width: 500,
+            height: 430,
+            position: {
+                my: 'center',
+                at: 'center',
+                of: window
+            },
+            dragEnabled: true,
+            closeOnOutsideClick: true,
+            contentTemplate: (e) => {
+                return $('#form-clientes')
+            },
+            toolbarItems: [{
+                toolbar: 'top',
+                text: "Añadir cliente",
+                location: "center"
+            }, {
+                widget: "dxButton",
+                toolbar: 'bottom',
+                location: "after",
+                options: {
+                    text: "Añadir",
+                    icon: "plus",
+                    type: 'success',
+                    onClick: () => {
+                        this.addClientes();
+                        let popForm = $('#form-popup').dxPopup('instance');
+                        popForm.hide();
+                    }
+                }
+            }]
+        };
+
+        addPopup: any = {
+            text: "Agregar",
+            icon: "plus",
+            type: 'success',
+            onClick: (e) => {
+                $('#form-clientes').dxForm('instance').resetValues();
+                this.limpiarForm();
+                this.idRow(0);
+                this.enable(true);
+                let popForm = $('#form-popup').dxPopup('instance');
+                popForm.show();
+            }
         }
+
+        modifPopup: any = {
+            text: "Modificar",
+            icon: "edit",
+            type: 'default',
+            disabled: this.enable,
+            onClick: (e) => {
+                let popForm = $('#form-popup').dxPopup('instance');
+                popForm.show();
+            }
+        }
+
     }
 }
