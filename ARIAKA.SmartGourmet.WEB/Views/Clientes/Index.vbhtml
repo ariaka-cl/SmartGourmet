@@ -1,7 +1,9 @@
 ﻿@Code
     ViewData("Title") = "Index"
 End Code
-<div id="titulo" class="long-title" style="text-align:center;"><h3 style="text-shadow: 3px 3px 19px #a7a7a7; letter-spacing:2px;margin-top:30px;">CREACIÓN CLIENTES</h3></div>
+<link rel="dx-theme" data-theme="generic.greenmist" href="https://cdn3.devexpress.com/jslib/18.2.5/css/dx.greenmist.css" />
+<div id="titulo" class="long-title" style="text-align:center;"><h3 style="text-shadow: 3px 3px 19px #a7a7a7; letter-spacing:2px;margin-top:30px;">SMARTGOURMET</h3></div>
+<div id="titulo" class="long-title" style="text-align:center;"><h4 style="text-shadow: 3px 3px 19px #a7a7a7; letter-spacing:2px;">Gestionar Clientes</h4></div>
 
 <div id="cuerpo" style="margin-bottom:70px" class="dx-fieldset">
 
