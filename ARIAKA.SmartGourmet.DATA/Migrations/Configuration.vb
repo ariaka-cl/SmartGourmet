@@ -5,14 +5,14 @@ Imports System.Linq
 
 Namespace Migrations
 
-    Friend NotInheritable Class Configuration 
-        Inherits DbMigrationsConfiguration(Of SGContext)
+    Friend NotInheritable Class Configuration
+        Inherits DbMigrationsConfiguration(Of Model.SGContext)
 
         Public Sub New()
             AutomaticMigrationsEnabled = False
         End Sub
 
-        Protected Overrides Sub Seed(context As SGContext)
+        Protected Overrides Sub Seed(context As Model.SGContext)
             '  This method will be called after migrating to the latest version.
 
             '  You can use the DbSet(Of T).AddOrUpdate() helper extension method 
