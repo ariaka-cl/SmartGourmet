@@ -52,7 +52,7 @@ Namespace Controllers.API
                     Return Me.Ok(model) ' se retorna lo que se ha ingresado en public function
                 End If
 
-                Dim cate As New Categoria With {.NombreCategoria = model.Nombre, .FechaCreacion = Date.Now.Date}
+                Dim cate As New Categoria With {.NombreCategoria = model.Nombre, .FechaCreacion = Date.Now}
                 db.Categorias.Add(cate) 'se agrega 
                 db.SaveChanges()        'se guarda
                 model.ID = cate.ID

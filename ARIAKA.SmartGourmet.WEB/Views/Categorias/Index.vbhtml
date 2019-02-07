@@ -25,15 +25,6 @@ End Code
         </div>
     </div>
 
-
-    
-
-
-    <div id="form" data-bind="dxForm: formCategorias"></div>
-    <div id="grid-categoria" data-bind="dxDataGrid: gridCategorias"></div>
-    <br />
-    <div data-bind="dxButton: botonEliminar"></div> 
-
     @Section scripts
         <script type="text/javascript" src="~/Scripts/app/Categorias/categorias.js"></script>
         <script>

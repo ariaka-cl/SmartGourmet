@@ -12,7 +12,8 @@ namespace Categorias {
         public idRowIndex: KnockoutObservable<number> = ko.observable(-1);
         public nombre: KnockoutObservable<String> = ko.observable("");
         public fecha: KnockoutObservable<any> = ko.observable<any>(null);	
-       
+
+          
         getCategoria(): void {
             this.categorias([]);
             //this.fecha();
@@ -24,7 +25,7 @@ namespace Categorias {
                         this.categorias.push({
                             ID: data[i].id,
                             Nombre: data[i].nombre,
-                            FechaCreacion: data[i].fecha
+                            FechaCreacion: data[i].fechaCreacion
                         });
                     }
                 }
@@ -33,15 +34,19 @@ namespace Categorias {
 
         addCategoria(): void {
             let formData: any = $('#text-nombre').dxTextBox('option').value;
+
+            if (formData == "" || formData == null || formData == undefined) {
+                DevExpress.ui.notify("No se puede crear categoría, falta nombre", "error", 3000);
+                return;
+            }
             $.ajax({
                 type: 'POST',
                 url: 'api/categorias',
                 data: {
                     ID: this.idRow,
                     Nombre: formData,
-                    FechaCracion: this.fecha
-                    //FechaCracion: moment().format("YYYY-MM-DD HH:mm:ss"),
-                },
+                    FechaCreacion: this.fecha
+                 },
                 success: (data: any): void => {
                     DevExpress.ui.notify("Datos Guardados Satisfactoriamente", "success", 2000);
                     $('#text-nombre').dxTextBox('instance').repaint();
@@ -60,14 +65,16 @@ namespace Categorias {
         deleteCategoria(id: number): void {
             $.ajax({
                 type: 'DELETE',
-                url: 'api/categorias/' + id,
-                success: (data: any): void => {
-                    $('#text-nombre').dxTextBox('instance').reset();
-                    let grid = $('#grid-cate').dxDataGrid('instance');
-                    grid.refresh();
-                    grid.repaint();
-                }
-            });
+                url: 'api/categorias/' + id
+            }).done((data: any): void => {
+                DevExpress.ui.notify("Datos se Eliminaron Satisfactoriamente", "success", 2000);
+                $('#text-nombre').dxTextBox('instance').reset();
+                let grid = $('#grid-cate').dxDataGrid('instance');
+                grid.refresh();
+                grid.repaint();
+                }).fail((data: any): void => {
+                    DevExpress.ui.notify("No se pueden eliminar los datos", "error", 2000);
+                });
 
 
         }
@@ -91,7 +98,7 @@ namespace Categorias {
             selection: {
                 mode: "single"
             },
-            columns: [{ dataField: 'ID', visible: false }, 'Nombre', { dataField: 'FechaCracion', visible: false },
+            columns: [{ dataField: 'ID', visible: false }, 'Nombre',
                 {
                     dataField: 'FechaCreacion',
                     dataType: 'date',
@@ -101,18 +108,32 @@ namespace Categorias {
                 texts: {
                     confirmDeleteMessage: '¿Esta seguro en eliminar registro?'
                 }
+             },
+            onRowRemoved: () => {
+                    let index = this.idRow();
+                    this.deleteCategoria(index);
+             },
+            filterRow: {
+                visible: true,
+                showOperationChooser: true,
+                applyFilter: "auto"
+            },
+            searchPanel: {
+                visible: true,
+                width: 240,
+                placeholder: "Buscar..."
             },
             onRowClick: (e) => {
                 this.enable(false);
                 let cateData: any = {
                     ID: e.data.ID,
                     Nombre: e.data.Nombre,
-                    FechaCracion: e.data.Fecha
+                    FechaCreacion: e.data.FechaCreacion
                 }
                 this.idRow(cateData.ID);
                 this.idRowIndex(e.rowIndex);
                 this.nombre(cateData.Nombre);
-                this.fecha(cateData.FechaCracion)
+                this.fecha(cateData.FechaCreacion)
             }
         }
 
@@ -132,11 +153,9 @@ namespace Categorias {
             disabled: this.enable,
             onClick: () => {
                 let grid = $('#grid-cate').dxDataGrid('instance');
-                let index = this.idRow();
                 grid.deleteRow(this.idRowIndex());
                 grid.repaint();
-                this.deleteCategoria(index);
-            }
+             }
         }
     }
 }
