@@ -111,5 +111,16 @@ Namespace Controllers.API
             End Try
 
         End Function
+
+        <Route("roles", Name:="getRoles")>
+        <HttpGet>
+        Public Function GetRoles() As IHttpActionResult
+            Dim tipoRol As New List(Of Models.RolDTO)
+
+            tipoRol = (From v As Integer In TryCast(System.Enum.GetValues(GetType(Rol)), Integer()) Select New Models.RolDTO With {.Clave = v, .Nombre = System.Enum.GetName(GetType(Rol), v)}).ToList()
+
+            Return Me.Ok(New With {.tipoRol = tipoRol})
+        End Function
+
     End Class
 End Namespace

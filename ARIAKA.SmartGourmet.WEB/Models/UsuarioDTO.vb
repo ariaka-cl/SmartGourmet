@@ -7,8 +7,4 @@
         Public Property Nombre As String
         Public Property Apellido As String
     End Class
-
-    Public Class RolDTO
-        Public Property ID As Integer
-    End Class
 End Namespace
