@@ -12,6 +12,10 @@ namespace Categorias {
         public idRowIndex: KnockoutObservable<number> = ko.observable(-1);
         public nombre: KnockoutObservable<String> = ko.observable("");
         public fecha: KnockoutObservable<any> = ko.observable<any>(null);	
+        public limpiar() {
+            let formData: any = $('#text-nombre').dxTextBox('option').value;
+            formData = "";
+         };
 
           
         getCategoria(): void {
@@ -54,6 +58,7 @@ namespace Categorias {
             }).done((result) => {
                 this.getCategoria();
                 let grid = $('#grid-cate').dxDataGrid('instance');
+                this.limpiar();
                 grid.refresh();
                 grid.repaint();
                 this.idRow(0);
@@ -70,6 +75,9 @@ namespace Categorias {
                 DevExpress.ui.notify("Datos se Eliminaron Satisfactoriamente", "success", 2000);
                 $('#text-nombre').dxTextBox('instance').reset();
                 let grid = $('#grid-cate').dxDataGrid('instance');
+                this.limpiar();
+                this.idRow(0);
+                this.enable(true);
                 grid.refresh();
                 grid.repaint();
                 }).fail((data: any): void => {
