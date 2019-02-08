@@ -196,6 +196,9 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\CategoriasDTO.vb" />
+    <Compile Include="Controllers\API\ClientesApiController.vb" />
+    <Compile Include="Controllers\ClientesController.vb" />
+    <Compile Include="Models\ClienteDTO.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -340,6 +343,7 @@
     <Content Include="Scripts\jquery-3.3.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.3.1.min.map" />
     <Content Include="Views\Categorias\Index.vbhtml" />
+    <Content Include="Views\Clientes\Index.vbhtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="favicon.ico" />
@@ -389,6 +393,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\app\Categorias\categorias.ts" />
+    <TypeScriptCompile Include="Scripts\app\Clientes\clientes.ts" />
     <TypeScriptCompile Include="Scripts\typings\devextreme\devextreme.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\knockout\knockout.d.ts" />
