@@ -10,6 +10,7 @@ namespace Usuarios {
         public idRow: KnockoutObservable<number> = ko.observable(0);
         public idRowIndex: KnockoutObservable<number> = ko.observable(-1);
         public tipoRoles: KnockoutObservableArray<any> = ko.observableArray<any>();
+        public nombreRol: KnockoutObservable<any> = ko.observable<any>();
 
         public limpiarForm() {
             let formData: any = $('#form-usuarios').dxForm('option').formData;
@@ -35,7 +36,8 @@ namespace Usuarios {
                         Nombre: data[i].nombre,
                         Apellido: data[i].apellido,
                         Password: data[i].password,
-                        Rol: data[i].rol
+                        Rol: data[i].rol,
+                        RolStr: data[i].rolStr
                     });
                 }
             }).fail((data: any) => {
@@ -86,7 +88,6 @@ namespace Usuarios {
                 this.getUsuarios();
                 let grid = $('#grid-usuarios').dxDataGrid('instance');
                 this.limpiarForm();
-                //this.idRow(0);
                 this.enable(true);
                 grid.refresh();
                 grid.repaint();
@@ -112,19 +113,6 @@ namespace Usuarios {
 
         constructor() {
             this.getUsuarios();
-
-            //$.ajax({
-            //    type: 'GET',
-            //    url: 'api/usuarios/roles'
-            //}).done((data: any) => {
-            //    for (var i: number = 0; i < data.tipoRol.length; i++) {
-            //        this.tipoRoles.push({
-            //            Nombre: data.tipoRol[i].nombre,
-            //            Clave: data.tipoRol[i].clave,
-            //        });
-            //    }
-            //})
-        
             this.tipoRoles([]);
             $.getJSON('api/usuarios/roles').then((result: any): void => {
                 for (var i: number = 0; i < result.tipoRol.length; i++) {
@@ -133,11 +121,6 @@ namespace Usuarios {
                         Clave: result.tipoRol[i].clave,
                     });
                 }
-                //this.nombreRol(this.tipoRoles.Nombre);
-                //this.claveRol(this.tipoRoles.Clave);
-                //this.tipoRoles.push(['as', 'qweq']);
-                //this.usuarios.rol = this.tipoRoles[0];
-                //$("#rolTipo").dxSelectBox({ items: result.tipoRol, displayExpr: 'display', valueExpr: 'value', value: result.tipoRol[0].value });
             });
         }
 
@@ -150,42 +133,41 @@ namespace Usuarios {
                 items: [{
                     dataField: "Run",
                     editorType: "dxTextBox",
-                    maxlength: 10,
+                    label: { text: 'RUT' },
                     editorOptions: {
-                        label: "RUT",
+                        placeholder: "11111111-1",
+                        maxLength: 10,
                         showClearButton: true
                     }
                 }, {
                     dataField: "Nombre",
                     editorType: "dxTextBox",
                     editorOptions: {
-                        label: "Nombre",
                         showClearButton: true
                     }
                 }, {
                     dataField: "Apellido",
                     editorType: "dxTextBox",
                     editorOptions: {
-                        label: "Apellido",
                         showClearButton: true
                     }
                 }, {
                     dataField: "Password",
                     editorType: "dxTextBox",
+                    label: { text: 'Contraseña' },
                     editorOptions: {
                         mode: 'password',
-                        label: "Contraseña",
                         showClearButton: true
                     }
                 }, {
                     dataField: "Rol",
                     editorType: "dxSelectBox",
                     editorOptions: {
-                        label: "Rol",
-                        showClearButton: true,
                         dataSource: this.tipoRoles,
+                        placeholder: "Seleccione un rol...",
                         displayExpr: 'Nombre',
-                        valueExpr: 'Clave'
+                        valueExpr: 'Clave',
+                        value: this.nombreRol
                     }
                 }]
             }]
@@ -212,7 +194,7 @@ namespace Usuarios {
             selection: {
                 mode: "single"
             },
-            columns: [{ dataField: 'ID', visible: false }, 'Run', 'Nombre', 'Apellido', 'Password', { dataField: 'Rol', width: "12%" }],
+            columns: [{ dataField: 'ID', visible: false }, { dataField: 'Run', caption: 'RUT' }, 'Nombre', 'Apellido', { dataField: 'Password', caption: 'Contraseña' }, { dataField: 'RolStr', caption: 'Rol', width: "12%" }, { dataField: 'Rol', visible: false }],
             editing: {
                 texts: {
                     confirmDeleteMessage: '¿Esta seguro de eliminar registro de usuario?'
@@ -257,6 +239,7 @@ namespace Usuarios {
                     Password: e.data.Password,
                     Rol: e.data.Rol
                 }
+                this.nombreRol(usuarioData.Rol);
                 this.idRow(usuarioData.ID);
                 this.idRowIndex(e.rowIndex);
                 formData.formData = usuarioData;

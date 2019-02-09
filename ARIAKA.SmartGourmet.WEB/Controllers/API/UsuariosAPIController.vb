@@ -23,7 +23,8 @@ Namespace Controllers.API
                                                                 .Apellido = usuario.Apellido,
                                                                 .Run = usuario.Run,
                                                                 .Password = usuario.Password,
-                                                                .Rol = usuario.Rol})
+                                                                .Rol = usuario.Rol,
+                                                                .RolStr = usuario.Rol.ToString})
                 Next
                 Return Me.Ok(listUsuarioDto)
 
@@ -42,7 +43,7 @@ Namespace Controllers.API
 
             Dim db As New SGContext
             Try
-                If model.ID <> 0 Then 'Actualiza
+                If model.ID <> 0 Then
                     Dim userExist As Usuario = db.Usuarios.Where(Function(t) t.ID = model.ID).SingleOrDefault()
                     With userExist
                         .Nombre = model.Nombre
@@ -58,12 +59,6 @@ Namespace Controllers.API
                 If db.Usuarios.Where(Function(t) t.Run = model.Run).Any Then
                     Return Me.Content(HttpStatusCode.BadRequest, "Este usuario ya existe.")
                 End If
-
-                'If model.Nombre.Contains(" ") Then
-                '    Dim nombreCompleto As String() = model.Nombre.Split(" ")
-                '    model.Nombre = nombreCompleto(0)
-                '    model.Apellido = nombreCompleto(1)
-                'End If
 
                 Dim usuario As New Usuario With {.Nombre = model.Nombre,
                                                 .Apellido = model.Apellido,
