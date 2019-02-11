@@ -24,6 +24,7 @@
                     <li>@Html.ActionLink("Inicio", "Index", "Home")</li>
                     <li>@Html.ActionLink("Acerca de", "About", "Home")</li>
                     <li>@Html.ActionLink("Contacto", "Contact", "Home")</li>
+                    <li>@Html.ActionLink("Gestion Categorias", "Index", "Home")</li>
                     <li>@Html.ActionLink("Clientes", "Index", "Clientes")</li>
                 </ul>
             </div>
