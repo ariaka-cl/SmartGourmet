@@ -200,8 +200,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\CategoriasDTO.vb" />
-    <Compile Include="Controllers\API\ClientesApiController.vb" />
-    <Compile Include="Controllers\ClientesController.vb" />
     <Compile Include="Models\ClienteDTO.vb" />
     <Compile Include="Models\RolDTO.vb" />
     <Compile Include="Models\UsuarioDTO.vb" />
