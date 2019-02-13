@@ -191,8 +191,10 @@
     <Compile Include="App_Start\RouteConfig.vb" />
     <Compile Include="App_Start\WebApiConfig.vb" />
     <Compile Include="Controllers\API\ClientesApiController.vb" />
+    <Compile Include="Controllers\API\ProductosAPIController.vb" />
     <Compile Include="Controllers\API\UsuariosAPIController.vb" />
     <Compile Include="Controllers\ClientesController.vb" />
+    <Compile Include="Controllers\ProductosController.vb" />
     <Compile Include="Controllers\UsuariosController.vb" />
     <Compile Include="Controllers\API\CategoriasAPIController.vb" />
     <Compile Include="Controllers\API\MesasAPIController.vb" />
@@ -203,6 +205,7 @@
     </Compile>
     <Compile Include="Models\CategoriasDTO.vb" />
     <Compile Include="Models\ClienteDTO.vb" />
+    <Compile Include="Models\ProductoDTO.vb" />
     <Compile Include="Models\RolDTO.vb" />
     <Compile Include="Models\UsuarioDTO.vb" />
     <Compile Include="Models\EstadoDTO.vb" />
@@ -354,6 +357,7 @@
     <Content Include="Views\Clientes\Index.vbhtml" />
     <Content Include="Views\Usuarios\Index.vbhtml" />
     <Content Include="Views\Mesas\Index.vbhtml" />
+    <Content Include="Views\Productos\Index.vbhtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="favicon.ico" />
@@ -404,6 +408,7 @@
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\app\Categorias\categorias.ts" />
     <TypeScriptCompile Include="Scripts\app\Clientes\clientes.ts" />
+    <TypeScriptCompile Include="Scripts\app\Productos\productos.ts" />
     <TypeScriptCompile Include="Scripts\app\Usuarios\usuarios.ts" />
     <TypeScriptCompile Include="Scripts\app\Mesas\mesas.ts" />
     <TypeScriptCompile Include="Scripts\typings\devextreme\devextreme.d.ts" />

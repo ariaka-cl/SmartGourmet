@@ -1,9 +1,8 @@
-﻿Namespace Model
-    Public Class Producto
+﻿Namespace Models
+    Public Class ProductoDTO
         Public Property ID As Integer
         Public Property Nombre As String
-        Public Property TipoID As Integer
-        Public Overridable Property Tipo As Categoria
+        Public Property Tipo As CategoriasDTO
         Public Property Precio As Integer
         Public Property Descuento As Integer
         Public Property StockActual As Integer
@@ -11,3 +10,4 @@
         Public Property Foto As Byte()
     End Class
 End Namespace
+
