@@ -85,6 +85,14 @@
       <DependentUpon>201901240740262_add_clases_2.vb</DependentUpon>
     </Compile>
     <Compile Include="Migrations\201901240740262_add_clases_2.vb" />
+    <Compile Include="Migrations\201902120313161_modified_producto.Designer.vb">
+      <DependentUpon>201902120313161_modified_producto.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201902120313161_modified_producto.vb" />
+    <Compile Include="Migrations\201902130141121_nombre_migracion.Designer.vb">
+      <DependentUpon>201902130141121_nombre_migracion.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201902130141121_nombre_migracion.vb" />
     <Compile Include="Migrations\Configuration.vb" />
     <Compile Include="Model\Caja.vb" />
     <Compile Include="Model\Categoria.vb" />
@@ -130,6 +138,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201901240740262_add_clases_2.resx">
       <DependentUpon>201901240740262_add_clases_2.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902120313161_modified_producto.resx">
+      <DependentUpon>201902120313161_modified_producto.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902130141121_nombre_migracion.resx">
+      <DependentUpon>201902130141121_nombre_migracion.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
