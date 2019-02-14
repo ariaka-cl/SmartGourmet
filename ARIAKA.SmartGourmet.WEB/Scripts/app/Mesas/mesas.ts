@@ -15,7 +15,7 @@ namespace Mesas {
         public limpiar() {
             let formData: any = $('#form-mesas').dxForm('option').formData;
             formData.ID = 0;
-            formData.NumMesa = "";
+            formData.numMesa = "";
             formData.Capacidad = "";
             formData.Estado = "";
         };
@@ -30,7 +30,7 @@ namespace Mesas {
                 for (var i: number = 0; i < data.length; i++) {
                     this.mesas.push({
                         ID: data[i].id,
-                        NumMesas: data[i].nummesas,
+                        NumMesa: data[i].numMesa,
                         Capacidad: data[i].capacidad,
                         Estado: data[i].estado
                     });
@@ -42,9 +42,9 @@ namespace Mesas {
 
         addMesas(): void {
 
-            let formData: any = $('#form-usuarios').dxForm('option').formData;
+            let formData: any = $('#form-mesas').dxForm('option').formData;
 
-            if (formData.NumMesa == "" || formData.NumMesa == null || formData.NumMesa == undefined) {
+            if (formData.numMesa == "" || formData.numMesa == null || formData.numMesa == undefined) {
                 DevExpress.ui.notify("No se puede crear número de mesa, falta número", "error", 3000);
                 return;
             }
@@ -65,7 +65,7 @@ namespace Mesas {
                 url: url,
                 data: {
                     ID: formData.ID,
-                    NumMesa: formData.NumMesa,
+                    NumMesa: formData.numMesa,
                     Capacidad: formData.Capacidad,
                     Estado: formData.Estado,
                  }
@@ -102,10 +102,10 @@ namespace Mesas {
             this.getMesas();
             this.tipoEstados([]);
             $.getJSON('api/mesas/estados').then((result: any): void => {
-                for (var i: number = 0; i < result.tipoEstados.length; i++) {
+                for (var i: number = 0; i < result.tipoEstado.length; i++) {
                     this.tipoEstados.push({
-                        Nombre: result.tipoEstados[i].nombre,
-                        Clave: result.tipoEstados[i].clave,
+                        Nombre: result.tipoEstado[i].nombre,
+                        Clave: result.tipoEstado[i].clave,
                     });
                 }
             });
@@ -131,21 +131,53 @@ namespace Mesas {
                     }
                 }, {
                     dataField: "Estado",
-                    editorType: "dxTextBox",
+                    editorType: "dxSelectBox",
                     editorOptions: {
-                        showClearButton: true
-                    }
+                        dataSource: this.tipoEstados,
+                        placeholder: "Seleccionar...",
+                        displayExpr: 'Nombre',
+                        valueExpr: 'Clave'
+                     }
                 }]
             }]
         };
 
-        tileview: any = {
+        tileview: any =
+         {
             dataSource: this.mesas,
+            //activeStateEnabled: true,
             items: null,
-            height: 390,
+            height: 270,
             baseItemHeight: 120,
-            baseItemWidth: 185,
+            baseItemWidth: 200,
             itemMargin: 10,
+            hoverStateEnabled: true,
+            hint: "Mesa",
+            item: this.mesas,
+            itemTemplate: function (itemData, itemIndex, itemElement) {
+                itemElement.append("<div class=\"price\">"
+                    //+ " <b>ID:</b>" + itemData.ID + "<br>"
+                    + " <b>Mesa:</b>" + itemData.numMesa + "<br>"
+                    + " <b>Capacidad:</b>" + itemData.Capacidad + "<br>"
+                    //+ " <b>Estado:</b>" + itemData.Estado 
+                    + "</div><div class=\"image\" style=\"background-image: url('https://cdn2.iconfinder.com/data/icons/food-drink-10/24/food-drink-36-512.png')\"></div>");
+             },
+            onItemClick: (e) => {
+                this.enable(false);
+                let formData: any = $('#form-mesas').dxForm('option');
+                let mesaData: any = {
+                    ID: e.data.ID,
+                    NumMesa: e.data.NumMesa,
+                    Capacidad: e.data.Capacidad,
+                    Estado: e.data.Estado
+                 }
+                //this.nombreEstado(usuarioData.Rol);
+                this.idRow(mesaData.ID);
+                this.idRowIndex(e.rowIndex);
+                formData.formData = mesaData;
+                let form = $('#form-mesas').dxForm('instance');
+                form.repaint();
+            }
             //itemTemplate: function (itemData, itemIndex, itemElement) {
                     //itemElement.append("<div class=\"price\">" + Globalize.formatCurrency(itemData.Price, "USD", { maximumFractionDigits: 0 }) +
                         //"</div><div class=\"image\" style=\"background-image: url('" + itemData.ImageSrc + "')\"></div>");

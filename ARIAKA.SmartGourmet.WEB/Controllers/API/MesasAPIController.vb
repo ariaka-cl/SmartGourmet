@@ -44,8 +44,8 @@ Namespace Controllers.API
             Dim db As New SGContext
             Try
                 If model.ID <> 0 Then
-                    Dim cateExist As Mesa = db.Mesas.Where(Function(u) u.ID = model.ID).SingleOrDefault()
-                    With cateExist
+                    Dim mesaExist As Mesa = db.Mesas.Where(Function(u) u.ID = model.ID).SingleOrDefault()
+                    With mesaExist
                         .NumMesa = model.NumMesa
                         .Capacidad = model.Capacidad
                         .Estado = model.Estado
@@ -54,7 +54,7 @@ Namespace Controllers.API
                     Return Me.Ok(model)
                 End If
 
-                Dim mesa As New Mesa With {.NumMesa = model.NumMesa, .Capacidad = model.Capacidad}
+                Dim mesa As New Mesa With {.NumMesa = model.NumMesa, .Capacidad = model.Capacidad, .Estado = model.Estado}
                 db.Mesas.Add(mesa)
                 db.SaveChanges()
                 model.ID = mesa.ID
@@ -84,6 +84,16 @@ Namespace Controllers.API
             Finally
                 db.Dispose()
             End Try
+        End Function
+
+        <Route("estados", Name:="getEstados")>
+        <HttpGet>
+        Public Function GetEstados() As IHttpActionResult
+            Dim tipoEstado As New List(Of Models.EstadoDTO)
+
+            tipoEstado = (From v As Integer In TryCast(System.Enum.GetValues(GetType(EstadoPedido)), Integer()) Select New Models.EstadoDTO With {.Clave = v, .Nombre = System.Enum.GetName(GetType(EstadoPedido), v)}).ToList()
+
+            Return Me.Ok(New With {.tipoEstado = tipoEstado})
         End Function
 
     End Class

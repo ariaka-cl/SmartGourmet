@@ -3,6 +3,7 @@ Imports System.Web.Http
 Imports ARIAKA.SmartGourmet.DATA.Model
 
 Namespace Controllers.API
+    <RoutePrefix("api/productos")>
     Public Class ProductosAPIController
         Inherits ApiController
 
