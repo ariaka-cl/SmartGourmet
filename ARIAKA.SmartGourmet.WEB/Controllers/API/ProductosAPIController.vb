@@ -3,6 +3,7 @@ Imports System.Web.Http
 Imports ARIAKA.SmartGourmet.DATA.Model
 
 Namespace Controllers.API
+    <RoutePrefix("api/productos")>
     Public Class ProductosAPIController
         Inherits ApiController
 
@@ -14,15 +15,16 @@ Namespace Controllers.API
             Try
                 Dim listProductos As List(Of Producto) = New List(Of Producto)
                 Dim listProductoDto As New List(Of Models.ProductoDTO)
-                If listProductos Is Nothing OrElse listProductos.Count = 0 Then Return Me.Ok(New List(Of Models.ProductoDTO))
-                Dim cate As Categoria = New Categoria
+                'Dim cate As Categoria = New Categoria
 
                 If id < 0 Then
                     listProductos = db.Productos.ToList()
                 Else
-                    cate = db.Categorias.Where(Function(c) c.ID = id).SingleOrDefault
+                    'cate = db.Categorias.Where(Function(c) c.ID = id).SingleOrDefault
                     listProductos = db.Productos.Where(Function(p) p.Tipo.ID = id).ToList()
                 End If
+
+                If listProductos Is Nothing OrElse listProductos.Count = 0 Then Return Me.Ok(New List(Of Models.ProductoDTO))
 
                 For Each producto As Producto In listProductos
                     listProductoDto.Add(New Models.ProductoDTO With {.ID = producto.ID,
@@ -32,8 +34,9 @@ Namespace Controllers.API
                                                                 .StockActual = producto.StockActual,
                                                                 .FechaCreacion = producto.FechaCreacion,
                                                                 .Foto = producto.Foto,
-                                                                .Tipo = New Models.CategoriasDTO With {.ID = cate.ID,
-                                                                                                       .Nombre = cate.NombreCategoria}})
+                                                                .Tipo = New Models.CategoriasDTO With {.ID = producto.Tipo.ID,
+                                                                                                    .Nombre = producto.Tipo.NombreCategoria
+}})
                 Next
                 Return Me.Ok(listProductoDto)
 
@@ -56,14 +59,14 @@ Namespace Controllers.API
                     Dim productExist As Producto = db.Productos.Where(Function(t) t.ID = model.ID).SingleOrDefault()
                     With productExist
                         .Nombre = model.Nombre
-                        .Tipo = db.Categorias.Where(Function(c) c.ID = model.Tipo.ID).SingleOrDefault()
+                        .Tipo = db.Categorias.Where(Function(c) c.ID = model.TipoID).SingleOrDefault()
                         .Precio = model.Precio
                         .Descuento = model.Descuento
                         .StockActual = model.StockActual
-                        .FechaCreacion = model.FechaCreacion
                         .Foto = model.Foto
                     End With
                     db.SaveChanges()
+                    model.Tipo = New Models.CategoriasDTO With {.ID = productExist.Tipo.ID, .Nombre = productExist.Tipo.NombreCategoria}
                     Return Me.Ok(model)
                 End If
 
@@ -72,16 +75,17 @@ Namespace Controllers.API
                 End If
 
                 Dim producto As New Producto With {.Nombre = model.Nombre,
-                                                .Tipo = db.Categorias.Where(Function(c) c.ID = model.Tipo.ID).SingleOrDefault(),
+                                                .Tipo = db.Categorias.Where(Function(c) c.ID = model.TipoID).SingleOrDefault(),
                                                 .Precio = model.Precio,
                                                 .Descuento = model.Descuento,
                                                 .StockActual = model.StockActual,
-                                                .FechaCreacion = model.FechaCreacion,
+                                                .FechaCreacion = Date.Now,
                                                 .Foto = model.Foto
                 }
                 db.Productos.Add(producto)
                 db.SaveChanges()
                 model.ID = producto.ID
+                model.Tipo = New Models.CategoriasDTO With {.ID = producto.Tipo.ID, .Nombre = producto.Tipo.NombreCategoria}
                 Return Me.Ok(model)
 
             Catch ex As Exception
