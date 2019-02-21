@@ -15,7 +15,7 @@ namespace Mesas {
         public limpiar() {
             let formData: any = $('#form-mesas').dxForm('option').formData;
             formData.ID = 0;
-            formData.numMesa = "";
+            formData.NumMesa = "";
             formData.Capacidad = "";
             formData.Estado = "";
         };
@@ -44,7 +44,7 @@ namespace Mesas {
 
             let formData: any = $('#form-mesas').dxForm('option').formData;
 
-            if (formData.numMesa == "" || formData.numMesa == null || formData.numMesa == undefined) {
+            if (formData.NumMesa == "" || formData.NumMesa == null || formData.NumMesa == undefined) {
                 DevExpress.ui.notify("No se puede crear número de mesa, falta número", "error", 3000);
                 return;
             }
@@ -54,7 +54,7 @@ namespace Mesas {
                 return;
             }
 
-            if (formData.Estado == "" || formData.Estado == null || formData.Estado == undefined) {
+            if (formData.Estado === "" || formData.Capacidad === null || formData.Capacidad === undefined) {
                 DevExpress.ui.notify("No se puede crear estado, falta estado", "error", 3000);
                 return;
             }
@@ -65,7 +65,7 @@ namespace Mesas {
                 url: url,
                 data: {
                     ID: formData.ID,
-                    NumMesa: formData.numMesa,
+                    NumMesa: formData.NumMesa,
                     Capacidad: formData.Capacidad,
                     Estado: formData.Estado,
                  }
@@ -155,34 +155,30 @@ namespace Mesas {
             hint: "Mesa",
             item: this.mesas,
             itemTemplate: function (itemData, itemIndex, itemElement) {
-                itemElement.append("<div class=\"price\">"
+                let url = "Content\/img\/food-drink-36-512.png";
+                itemElement.append(
                     //+ " <b>ID:</b>" + itemData.ID + "<br>"
-                    + " <b>Mesa:</b>" + itemData.numMesa + "<br>"
+                    " <b>Mesa:</b>" + itemData.NumMesa + "<br>"
                     + " <b>Capacidad:</b>" + itemData.Capacidad + "<br>"
-                    //+ " <b>Estado:</b>" + itemData.Estado 
-                    + "</div><div class=\"image\" style=\"background-image: url('https://cdn2.iconfinder.com/data/icons/food-drink-10/24/food-drink-36-512.png')\"></div>");
+                    + "<img src='" + encodeURI(url) + "' width='200' height='120' class='img- thumbnail'/>");
              },
             onItemClick: (e) => {
                 this.enable(false);
-                let formData: any = $('#form-mesas').dxForm('option');
                 let mesaData: any = {
-                    ID: e.data.ID,
-                    NumMesa: e.data.NumMesa,
-                    Capacidad: e.data.Capacidad,
-                    Estado: e.data.Estado
+                    ID: e.itemData.ID,
+                    NumMesa: e.itemData.NumMesa,
+                    Capacidad: e.itemData.Capacidad,
+                    Estado: e.itemData.Estado
                  }
                 //this.nombreEstado(usuarioData.Rol);
+                let formData: any = $('#form-mesas').dxForm('option');
+                formData.formData = mesaData;
                 this.idRow(mesaData.ID);
                 this.idRowIndex(e.rowIndex);
-                formData.formData = mesaData;
                 let form = $('#form-mesas').dxForm('instance');
                 form.repaint();
-            }
-            //itemTemplate: function (itemData, itemIndex, itemElement) {
-                    //itemElement.append("<div class=\"price\">" + Globalize.formatCurrency(itemData.Price, "USD", { maximumFractionDigits: 0 }) +
-                        //"</div><div class=\"image\" style=\"background-image: url('" + itemData.ImageSrc + "')\"></div>");
-             //}
-        };
+               }
+         };
 
         buttonOptionsDelete: any = {
             text: "Borrar",
@@ -190,9 +186,9 @@ namespace Mesas {
             type: 'trash',
             disabled: this.enable,
             onClick: () => {
-                //let grid = $('#tileview-mesas').dxDataGrid('instance');
-                //grid.deleteRow(this.idRowIndex());
-                //grid.repaint();
+                let formData: any = $('#form-mesas').dxForm('option');
+                formData.deleteRow(this.idRowIndex());
+                formData.repaint();
             }
         }
 
