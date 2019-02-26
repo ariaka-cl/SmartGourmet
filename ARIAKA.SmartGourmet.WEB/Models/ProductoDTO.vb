@@ -8,7 +8,7 @@
         Public Property Descuento As Integer
         Public Property StockActual As Integer
         Public Property FechaCreacion As Date
-        Public Property Foto As Byte()
+        Public Property Foto As String
     End Class
 End Namespace
 

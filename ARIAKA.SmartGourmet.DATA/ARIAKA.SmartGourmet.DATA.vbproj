@@ -97,6 +97,10 @@
       <DependentUpon>201902140444321_RemovedTipoID.vb</DependentUpon>
     </Compile>
     <Compile Include="Migrations\201902140444321_RemovedTipoID.vb" />
+    <Compile Include="Migrations\201902200548420_ProdFotoByteToString.Designer.vb">
+      <DependentUpon>201902200548420_ProdFotoByteToString.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201902200548420_ProdFotoByteToString.vb" />
     <Compile Include="Migrations\Configuration.vb" />
     <Compile Include="Model\Caja.vb" />
     <Compile Include="Model\Categoria.vb" />
@@ -151,6 +155,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201902140444321_RemovedTipoID.resx">
       <DependentUpon>201902140444321_RemovedTipoID.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902200548420_ProdFotoByteToString.resx">
+      <DependentUpon>201902200548420_ProdFotoByteToString.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>

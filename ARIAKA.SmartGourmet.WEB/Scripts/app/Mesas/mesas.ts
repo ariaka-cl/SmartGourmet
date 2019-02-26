@@ -73,11 +73,8 @@ namespace Mesas {
                 DevExpress.ui.notify("Datos guardados correctamente.", "success", 2000);
                 $('#form-mesas').dxForm('instance').resetValues();
                 this.getMesas();
-                //let grid = $('#grid-mesas').dxDataGrid('instance');
                 this.limpiar();
-                this.enable(true);
-                //grid.refresh();
-                //grid.repaint();
+                this.enable(true);           
             }).fail((data: any) => {
                 DevExpress.ui.notify(data.responseJSON, "error", 3000);
             });
@@ -90,6 +87,7 @@ namespace Mesas {
                 url: url
             }).done((data: any) => {
                 $('#form-mesas').dxForm('instance').resetValues();
+                this.getMesas();
                 this.limpiar();
                 this.enable(true);
                 DevExpress.ui.notify("Mesa eliminada satisfactoriamente", "success", 3000);
@@ -145,22 +143,23 @@ namespace Mesas {
         tileview: any =
          {
             dataSource: this.mesas,
-            //activeStateEnabled: true,
-            items: null,
-            height: 270,
+            noDataText: 'No hay datos disponibles por el momento ...',
+            showScrollbar: true,
+            items: Mesas,
+            height: 400,
             baseItemHeight: 120,
-            baseItemWidth: 200,
+            baseItemWidth: 185,
             itemMargin: 10,
             hoverStateEnabled: true,
             hint: "Mesa",
             item: this.mesas,
             itemTemplate: function (itemData, itemIndex, itemElement) {
-                let url = "Content\/img\/food-drink-36-512.png";
+                let url = "Content\/img\/b.png";
                 itemElement.append(
                     //+ " <b>ID:</b>" + itemData.ID + "<br>"
                     " <b>Mesa:</b>" + itemData.NumMesa + "<br>"
-                    + " <b>Capacidad:</b>" + itemData.Capacidad + "<br>"
-                    + "<img src='" + encodeURI(url) + "' width='200' height='120' class='img- thumbnail'/>");
+                    + "<b>Capacidad:</b>" + itemData.Capacidad + "<br>"
+                    + "<img src='" + encodeURI(url) + "' width='183' height='80' class='img- thumbnail'/>");
              },
             onItemClick: (e) => {
                 this.enable(false);
@@ -169,26 +168,46 @@ namespace Mesas {
                     NumMesa: e.itemData.NumMesa,
                     Capacidad: e.itemData.Capacidad,
                     Estado: e.itemData.Estado
-                 }
-                //this.nombreEstado(usuarioData.Rol);
+                }
+                
                 let formData: any = $('#form-mesas').dxForm('option');
                 formData.formData = mesaData;
                 this.idRow(mesaData.ID);
                 this.idRowIndex(e.rowIndex);
                 let form = $('#form-mesas').dxForm('instance');
                 form.repaint();
-               }
+            },
+            onItemRendered: (e) => {
+                let mesaData: any = {
+                    ID: e.itemData.ID,
+                    NumMesa: e.itemData.NumMesa,
+                    Capacidad: e.itemData.Capacidad,
+                    Estado: e.itemData.Estado
+                }
+                if (mesaData.Estado === 0) {
+                    e.itemElement.css("background-color", "yellow");
+                }
+                if (mesaData.Estado === 1) {
+                    e.itemElement.css("background-color", "MediumSeaGreen");
+                }
+                if (mesaData.Estado === 2) {
+                    e.itemElement.css("background-color", "OrangeRed");
+                }
+            }
+                     
          };
 
         buttonOptionsDelete: any = {
             text: "Borrar",
-            icon: "remove",
-            type: 'trash',
+            icon: "trash",
+            type: 'danger',
             disabled: this.enable,
             onClick: () => {
-                let formData: any = $('#form-mesas').dxForm('option');
-                formData.deleteRow(this.idRowIndex());
-                formData.repaint();
+                let index = this.idRow();
+                this.deleteMesas(index);
+                $('#tileview').dxTileView('instance').repaint();
+
+
             }
         }
 
