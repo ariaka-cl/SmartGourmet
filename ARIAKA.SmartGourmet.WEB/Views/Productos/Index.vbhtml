@@ -11,6 +11,9 @@ End Code
     <div class="dx-field" style="display: none;">
         <div id="form-productos" data-bind="dxForm: formOptions"></div>
     </div>
+    <div class="dx-field" style="display: none;">
+        <div id="gllry-productos" data-bind="dxGallery: gllryOptions"></div>
+    </div>
 
     <div class="dx-field">
         <div id="botonesDetalle" class="btn-group" role="group" style="float:right;">
@@ -20,15 +23,17 @@ End Code
         <div id="botonesDetalle" class="btn-group" role="group">
             <div id="botonCrear" data-bind="dxButton: addPopup"></div>
         </div>
+        <div id="botonesFilter" class="btn-group" role="group">
+            <div id="selectCate" data-bind="dxSelectBox: cateFilter"></div>
+        </div>
     </div>
 
     <div class="dx-field">
         <div id="grid-productos" data-bind="dxDataGrid: dataGridOptions"></div>
     </div>
 
-    <div class="dx-field">
-        <div id="form-popup" data-bind="dxPopup: formPopup"></div>
-    </div>
+    <div id="form-popup" data-bind="dxPopup: formPopup"></div>
+    <div id="gllry-popup" data-bind="dxPopup: gllryPopup"></div>
 
 </div>
 

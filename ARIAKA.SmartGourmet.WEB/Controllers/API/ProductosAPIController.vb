@@ -13,30 +13,30 @@ Namespace Controllers.API
 
             Dim db As New SGContext
             Try
-                Dim listProductos As List(Of Producto) = New List(Of Producto)
+                Dim listProductos As List(Of ProductoResultSet) = Nothing
                 Dim listProductoDto As New List(Of Models.ProductoDTO)
-                'Dim cate As Categoria = New Categoria
 
                 If id < 0 Then
-                    listProductos = db.Productos.ToList()
+                    listProductos = db.GetProdSinFoto()
                 Else
-                    'cate = db.Categorias.Where(Function(c) c.ID = id).SingleOrDefault
-                    listProductos = db.Productos.Where(Function(p) p.Tipo.ID = id).ToList()
+                    listProductos = db.GetProdSinFoto.Where(Function(p) p.Tipo_ID = id).ToList()
                 End If
 
                 If listProductos Is Nothing OrElse listProductos.Count = 0 Then Return Me.Ok(New List(Of Models.ProductoDTO))
 
-                For Each producto As Producto In listProductos
+                Dim listCategorias As List(Of Categoria) = db.Categorias.ToList()
+
+                For Each producto As ProductoResultSet In listProductos
+                    Dim cate As Categoria = listCategorias.Where(Function(c) c.ID = producto.Tipo_ID).SingleOrDefault
                     listProductoDto.Add(New Models.ProductoDTO With {.ID = producto.ID,
                                                                 .Nombre = producto.Nombre,
                                                                 .Precio = producto.Precio,
                                                                 .Descuento = producto.Descuento,
                                                                 .StockActual = producto.StockActual,
                                                                 .FechaCreacion = producto.FechaCreacion,
-                                                                .Foto = producto.Foto,
-                                                                .Tipo = New Models.CategoriasDTO With {.ID = producto.Tipo.ID,
-                                                                                                    .Nombre = producto.Tipo.NombreCategoria
-}})
+                                                                .Tipo = New Models.CategoriasDTO With {.ID = cate.ID,
+                                                                                                    .Nombre = cate.NombreCategoria
+                                        }})
                 Next
                 Return Me.Ok(listProductoDto)
 
@@ -63,7 +63,10 @@ Namespace Controllers.API
                         .Precio = model.Precio
                         .Descuento = model.Descuento
                         .StockActual = model.StockActual
-                        .Foto = model.Foto
+                        If model.Foto IsNot Nothing Then
+                            .Foto = model.Foto
+                        End If
+                        'System.Text.Encoding.UTF8.GetBytes(model.Nombre)
                     End With
                     db.SaveChanges()
                     model.Tipo = New Models.CategoriasDTO With {.ID = productExist.Tipo.ID, .Nombre = productExist.Tipo.NombreCategoria}
@@ -122,6 +125,22 @@ Namespace Controllers.API
                 db.Dispose()
             End Try
 
+        End Function
+
+        <HttpGet>
+        <Route("fotos/{id}", Name:="GetFoto")>
+        Public Function GetFoto(id As Integer) As IHttpActionResult
+
+            Dim db As New SGContext
+            Try
+                Dim fotob64 As String
+                fotob64 = db.Productos.Where(Function(c) c.ID = id).Select(Function(f) f.Foto).SingleOrDefault()
+                Return Me.Ok(fotob64)
+            Catch ex As Exception
+                Return Me.Content(HttpStatusCode.BadRequest, ex.Message)
+            Finally
+                db.Dispose()
+            End Try
         End Function
     End Class
 End Namespace
