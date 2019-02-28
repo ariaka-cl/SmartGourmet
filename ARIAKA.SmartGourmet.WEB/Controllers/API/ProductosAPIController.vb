@@ -15,12 +15,10 @@ Namespace Controllers.API
             Try
                 Dim listProductos As List(Of Producto) = New List(Of Producto)
                 Dim listProductoDto As New List(Of Models.ProductoDTO)
-                'Dim cate As Categoria = New Categoria
 
                 If id < 0 Then
                     listProductos = db.Productos.ToList()
                 Else
-                    'cate = db.Categorias.Where(Function(c) c.ID = id).SingleOrDefault
                     listProductos = db.Productos.Where(Function(p) p.Tipo.ID = id).ToList()
                 End If
 
