@@ -66,7 +66,6 @@ Namespace Controllers.API
                         If model.Foto IsNot Nothing Then
                             .Foto = model.Foto
                         End If
-                        'System.Text.Encoding.UTF8.GetBytes(model.Nombre)
                     End With
                     db.SaveChanges()
                     model.Tipo = New Models.CategoriasDTO With {.ID = productExist.Tipo.ID, .Nombre = productExist.Tipo.NombreCategoria}

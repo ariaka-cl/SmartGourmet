@@ -179,9 +179,6 @@ namespace Productos {
                             uploadMode: "useForm",
                             accept: 'image/*',
                             name: 'Foto',
-                            onInitialized: (e) => {
-
-                            },
                             onValueChanged: (e) => {
                                 let formImg: any = $('#form-productos').dxForm('option', 'formData');
                                 if (e.value !== null) {
