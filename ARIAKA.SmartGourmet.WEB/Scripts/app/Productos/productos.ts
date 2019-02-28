@@ -7,6 +7,7 @@ namespace Productos {
     export class ProductosIndexViewModel {
         public productos: KnockoutObservableArray<any> = ko.observableArray<any>();
         public categorias: KnockoutObservableArray<any> = ko.observableArray<any>();
+        public categoriasFilter: KnockoutObservableArray<any> = ko.observableArray<any>();
         public enable: KnockoutObservable<boolean> = ko.observable(true);
         public idRow: KnockoutObservable<number> = ko.observable(0);
         public idRowIndex: KnockoutObservable<number> = ko.observable(-1);
@@ -39,7 +40,6 @@ namespace Productos {
                         Descuento: data[i].descuento,
                         StockActual: data[i].stockActual,
                         FechaCreacion: data[i].fechaCreacion,
-                        Foto: data[i].foto,
                         Tipo: data[i].tipo
                     });     
                 }
@@ -61,6 +61,7 @@ namespace Productos {
                         nombre: data[i].nombre
                     }
                     this.categorias.push(cate);
+                    this.categoriasFilter.push(cate);
                 }
             }).fail((data: any) => {
                 DevExpress.ui.notify(data.responseJSON, "error", 3000);
@@ -79,25 +80,14 @@ namespace Productos {
                 DevExpress.ui.notify("No se puede crear producto, falta precio.", "error", 3000);
                 return;
             }
-            //if (formData.Descuento === "") {
-            //    DevExpress.ui.notify("No se puede crear producto, falta descuento.", "error", 3000);
-            //    return;
-            //}
             if (formData.StockActual === "") {
                 DevExpress.ui.notify("No se puede crear producto, falta stock.", "error", 3000);
                 return;
             }
-            //if (formData.Foto === "") {
-            //    DevExpress.ui.notify("No se puede crear producto, falta la imagen.", "error", 3000);
-            //    return;
-            //}
             if (formData.Tipo === "") {
                 DevExpress.ui.notify("No se puede crear producto, falta la categoría.", "error", 3000);
                 return;
             }
-
-            let file: DevExpress.ui.dxFileUploader = $('#dxfoto').dxFileUploader('instance');
-            file.option("value");
 
             let url = 'api/productos';
             $.ajax({
@@ -144,6 +134,7 @@ namespace Productos {
         constructor() {
             this.getProductos(this.prodByCat());
             this.getCategorias();
+            this.imagen([]);
         }
 
         formOptions: any = {
@@ -180,12 +171,30 @@ namespace Productos {
                     }
                 }, {
                     dataField: "Foto",
-                    template: function (data, itemElement) {
-                        itemElement.append($("<div>").attr("id", "dxfoto").dxFileUploader());
-                    },
-                    editorOptions: {
-                        uploadMethod: 'POST',
-                        uploadMode: "instantly"
+                    template: (data, itemElement) => {
+                        itemElement.append($("<div>").attr("id", "dxfoto").dxFileUploader({
+                            selectButtonText: "Seleccionar imagen",
+                            labelText: "o arrastra archivo aquí",
+                            uploadMethod: 'POST',
+                            uploadMode: "useForm",
+                            accept: 'image/*',
+                            name: 'Foto',
+                            onValueChanged: (e) => {
+                                let formImg: any = $('#form-productos').dxForm('option', 'formData');
+                                if (e.value !== null) {
+                                    var fotoblob = new Blob(e.value, { type: 'image/png' });
+                                    var reader = new FileReader();
+
+                                    reader.onload = function () {
+                                        formImg.Foto = reader.result;
+                                    };
+                                    reader.readAsDataURL(fotoblob);
+                                }
+                                else {
+                                    formImg.Foto = null;
+                                }
+                            }
+                        }));
                     }
                 }, {
                     dataField: "Tipo",
@@ -199,6 +208,13 @@ namespace Productos {
                 }]
             }]
         };
+
+        gllryOptions: any = {
+            dataSource: [this.imagen],
+            height: 400,
+            showIndicator: false,
+            stretchImages: true
+        }
 
         buttonOptionsDelete: any = {
             text: "Borrar",
@@ -227,7 +243,17 @@ namespace Productos {
                 { dataField: 'StockActual', caption: 'Stock Actual', width: "9%" },
                 { dataField: 'Precio', width: "8%" },
                 { dataField: 'Descuento', width: "9%" },
-                'Foto'],
+                {
+                    dataField: 'Foto',
+                    cellTemplate: function (element, info) {
+                        element.append("<div>" + info.text + "</div>").css("color", "blue").css("text-decoration", "underline");
+                    }, customizeText: function (cellInfo) {
+                        switch (cellInfo.value) {
+                            default:
+                                return 'Ver foto...'
+                        }
+                    }
+                }],
             editing: {
                 texts: {
                     confirmDeleteMessage: '¿Esta seguro de eliminar registro de producto?'
@@ -261,6 +287,22 @@ namespace Productos {
                 width: 240,
                 placeholder: "Buscar..."
             },
+            scrolling: {
+                mode: "virtual"
+            },
+            onCellClick: (e) => {
+                if (e.column.dataField == 'Foto') {
+                    this.imagen([]);
+                    $.getJSON('api/productos/fotos/' + e.data.ID).then((result: any): void => {
+                        var contentType = 'image/png';
+                        var blob = this.b64toBlob(result, contentType, 512);
+                        var blobUrl = URL.createObjectURL(blob);
+                        this.imagen(blobUrl);
+                    });
+                    let popGllry = $('#gllry-popup').dxPopup('instance');
+                    popGllry.show();
+                }
+            },
             onRowClick: (e) => {
                 this.enable(false);
                 let formData: any = $('#form-productos').dxForm('option');
@@ -270,8 +312,7 @@ namespace Productos {
                     Precio: e.data.Precio,
                     Descuento: e.data.Descuento,
                     StockActual: e.data.StockActual,
-                    Tipo: e.data.Tipo.id,
-                    Foto: e.data.Foto
+                    Tipo: e.data.Tipo.id
                 }
                 this.idRow(productoData.ID);
                 this.idRowIndex(e.rowIndex);
@@ -281,10 +322,26 @@ namespace Productos {
             }
         };
 
+        gllryPopup: any = {
+            visible: false,
+            width: 500,
+            height: 500,
+            position: {
+                my: 'center',
+                at: 'center',
+                of: window
+            },
+            dragEnabled: true,
+            closeOnOutsideClick: true,
+            contentTemplate: (e) => {
+                return $('#gllry-productos')
+            }
+        }
+
         formPopup: any = {
             visible: false,
             width: 500,
-            height: 590,
+            height: "auto",
             position: {
                 my: 'center',
                 at: 'center',
@@ -325,6 +382,8 @@ namespace Productos {
                 this.limpiarForm();
                 this.idRow(0);
                 this.enable(true);
+                let grid = $('#grid-productos').dxDataGrid('instance');
+                grid.deselectAll();
                 let popForm = $('#form-popup').dxPopup('instance');
                 popForm.show();
             }
@@ -339,6 +398,54 @@ namespace Productos {
                 let popForm = $('#form-popup').dxPopup('instance');
                 popForm.show();
             }
+        }
+
+        cateFilter: any = {
+            dataSource: this.categoriasFilter,
+            placeholder: "Filtrar por categoría...",
+            displayExpr: 'nombre',
+            valueExpr: 'id',
+            onInitialized: (e) => {
+                var newItem = {
+                    id: -1,
+                    nombre: "Todo"
+                };
+                var dataSource = e.component.getDataSource();
+                e.customItem = newItem;
+                dataSource.store().insert(newItem);
+                dataSource.reload();
+            },  
+            onItemClick: (e) => {
+                this.prodByCat(e.itemData.id);
+                this.getProductos(this.prodByCat());
+            }
+        }
+
+        public b64toBlob(b64Data, contentType, sliceSize) {
+            contentType = contentType || '';
+            sliceSize = sliceSize || 512;
+
+            var arr = b64Data.split(',');
+            b64Data = arr[arr.length - 1];
+
+            var byteCharacters = atob(b64Data);
+            var byteArrays = [];
+
+            for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+                var slice = byteCharacters.slice(offset, offset + sliceSize);
+
+                var byteNumbers = new Array(slice.length);
+                for (var i = 0; i < slice.length; i++) {
+                    byteNumbers[i] = slice.charCodeAt(i);
+                }
+
+                var byteArray = new Uint8Array(byteNumbers);
+
+                byteArrays.push(byteArray);
+            }
+
+            var blob = new Blob(byteArrays, { type: contentType });
+            return blob;
         }
     }
 }
