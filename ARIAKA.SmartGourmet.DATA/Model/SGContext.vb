@@ -31,5 +31,9 @@ Namespace Model
             modelBuilder.Conventions.Remove(Of ManyToManyCascadeDeleteConvention)()
         End Sub
 
+        Public Function GetProdSinFoto() As List(Of ProductoResultSet)
+            Return Me.Database.SqlQuery(Of ProductoResultSet)("spGetProdSinFoto").ToList()
+        End Function
+
     End Class
 End Namespace

@@ -85,6 +85,26 @@
       <DependentUpon>201901240740262_add_clases_2.vb</DependentUpon>
     </Compile>
     <Compile Include="Migrations\201901240740262_add_clases_2.vb" />
+    <Compile Include="Migrations\201902120313161_modified_producto.Designer.vb">
+      <DependentUpon>201902120313161_modified_producto.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201902120313161_modified_producto.vb" />
+    <Compile Include="Migrations\201902130141121_nombre_migracion.Designer.vb">
+      <DependentUpon>201902130141121_nombre_migracion.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201902130141121_nombre_migracion.vb" />
+    <Compile Include="Migrations\201902140444321_RemovedTipoID.Designer.vb">
+      <DependentUpon>201902140444321_RemovedTipoID.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201902140444321_RemovedTipoID.vb" />
+    <Compile Include="Migrations\201902200548420_ProdFotoByteToString.Designer.vb">
+      <DependentUpon>201902200548420_ProdFotoByteToString.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201902200548420_ProdFotoByteToString.vb" />
+    <Compile Include="Migrations\201902260148159_SP_GetProdSinFoto.Designer.vb">
+      <DependentUpon>201902260148159_SP_GetProdSinFoto.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201902260148159_SP_GetProdSinFoto.vb" />
     <Compile Include="Migrations\Configuration.vb" />
     <Compile Include="Model\Caja.vb" />
     <Compile Include="Model\Categoria.vb" />
@@ -96,6 +116,7 @@
     <Compile Include="Model\Pedido.vb" />
     <Compile Include="Model\Perdidas.vb" />
     <Compile Include="Model\Producto.vb" />
+    <Compile Include="Model\ProductoResultSet.vb" />
     <Compile Include="Model\Rol.vb" />
     <Compile Include="Model\SGContext.vb" />
     <Compile Include="Model\StockInicial.vb" />
@@ -130,6 +151,21 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201901240740262_add_clases_2.resx">
       <DependentUpon>201901240740262_add_clases_2.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902120313161_modified_producto.resx">
+      <DependentUpon>201902120313161_modified_producto.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902130141121_nombre_migracion.resx">
+      <DependentUpon>201902130141121_nombre_migracion.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902140444321_RemovedTipoID.resx">
+      <DependentUpon>201902140444321_RemovedTipoID.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902200548420_ProdFotoByteToString.resx">
+      <DependentUpon>201902200548420_ProdFotoByteToString.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902260148159_SP_GetProdSinFoto.resx">
+      <DependentUpon>201902260148159_SP_GetProdSinFoto.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>

@@ -191,8 +191,10 @@
     <Compile Include="App_Start\RouteConfig.vb" />
     <Compile Include="App_Start\WebApiConfig.vb" />
     <Compile Include="Controllers\API\ClientesApiController.vb" />
+    <Compile Include="Controllers\API\ProductosAPIController.vb" />
     <Compile Include="Controllers\API\UsuariosAPIController.vb" />
     <Compile Include="Controllers\ClientesController.vb" />
+    <Compile Include="Controllers\ProductosController.vb" />
     <Compile Include="Controllers\UsuariosController.vb" />
     <Compile Include="Controllers\API\CategoriasAPIController.vb" />
     <Compile Include="Controllers\CategoriasController.vb" />
@@ -201,6 +203,7 @@
     </Compile>
     <Compile Include="Models\CategoriasDTO.vb" />
     <Compile Include="Models\ClienteDTO.vb" />
+    <Compile Include="Models\ProductoDTO.vb" />
     <Compile Include="Models\RolDTO.vb" />
     <Compile Include="Models\UsuarioDTO.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -349,6 +352,7 @@
     <Content Include="Views\Categorias\Index.vbhtml" />
     <Content Include="Views\Clientes\Index.vbhtml" />
     <Content Include="Views\Usuarios\Index.vbhtml" />
+    <Content Include="Views\Productos\Index.vbhtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="favicon.ico" />
@@ -392,6 +396,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="p\" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
@@ -399,6 +404,7 @@
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\app\Categorias\categorias.ts" />
     <TypeScriptCompile Include="Scripts\app\Clientes\clientes.ts" />
+    <TypeScriptCompile Include="Scripts\app\Productos\productos.ts" />
     <TypeScriptCompile Include="Scripts\app\Usuarios\usuarios.ts" />
     <TypeScriptCompile Include="Scripts\typings\devextreme\devextreme.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
