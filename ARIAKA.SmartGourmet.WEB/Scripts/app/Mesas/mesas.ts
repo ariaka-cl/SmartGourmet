@@ -156,8 +156,7 @@ namespace Mesas {
             itemTemplate: function (itemData, itemIndex, itemElement) {
                 let url = "Content\/img\/b.png";
                 itemElement.append(
-                    //+ " <b>ID:</b>" + itemData.ID + "<br>"
-                    " <b>Mesa:</b>" + itemData.NumMesa + "<br>"
+                     " <b>Mesa:</b>" + itemData.NumMesa + "<br>"
                     + "<b>Capacidad:</b>" + itemData.Capacidad + "<br>"
                     + "<img src='" + encodeURI(url) + "' width='183' height='80' class='img- thumbnail'/>");
              },
