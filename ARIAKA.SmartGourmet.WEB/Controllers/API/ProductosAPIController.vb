@@ -34,8 +34,7 @@ Namespace Controllers.API
                                                                 .Descuento = producto.Descuento,
                                                                 .StockActual = producto.StockActual,
                                                                 .FechaCreacion = producto.FechaCreacion,
-                                                                .Tipo = New Models.CategoriasDTO With {.ID = cate.ID,
-                                                                                                    .Nombre = cate.NombreCategoria
+                                                                .Tipo = New Models.CategoriasDTO With {.ID = cate.ID, .Nombre = cate.NombreCategoria
                                         }})
                 Next
                 Return Me.Ok(listProductoDto)

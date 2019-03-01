@@ -197,7 +197,9 @@
     <Compile Include="Controllers\ProductosController.vb" />
     <Compile Include="Controllers\UsuariosController.vb" />
     <Compile Include="Controllers\API\CategoriasAPIController.vb" />
+    <Compile Include="Controllers\API\MesasAPIController.vb" />
     <Compile Include="Controllers\CategoriasController.vb" />
+    <Compile Include="Controllers\MesasController.vb" />
     <Compile Include="Global.asax.vb">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -206,6 +208,8 @@
     <Compile Include="Models\ProductoDTO.vb" />
     <Compile Include="Models\RolDTO.vb" />
     <Compile Include="Models\UsuarioDTO.vb" />
+    <Compile Include="Models\EstadoDTO.vb" />
+    <Compile Include="Models\MesaDTO.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -352,6 +356,7 @@
     <Content Include="Views\Categorias\Index.vbhtml" />
     <Content Include="Views\Clientes\Index.vbhtml" />
     <Content Include="Views\Usuarios\Index.vbhtml" />
+    <Content Include="Views\Mesas\Index.vbhtml" />
     <Content Include="Views\Productos\Index.vbhtml" />
   </ItemGroup>
   <ItemGroup>
@@ -406,6 +411,7 @@
     <TypeScriptCompile Include="Scripts\app\Clientes\clientes.ts" />
     <TypeScriptCompile Include="Scripts\app\Productos\productos.ts" />
     <TypeScriptCompile Include="Scripts\app\Usuarios\usuarios.ts" />
+    <TypeScriptCompile Include="Scripts\app\Mesas\mesas.ts" />
     <TypeScriptCompile Include="Scripts\typings\devextreme\devextreme.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\knockout\knockout.d.ts" />

@@ -17,17 +17,18 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                @Html.ActionLink("Nombre de aplicación", "Index", "Home", New With {.area = ""}, New With {.class = "navbar-brand"})
+                @Html.ActionLink("Smart Gourmet", "Index", "Home", New With {.area = ""}, New With {.class = "navbar-brand"})
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Inicio", "Index", "Home")</li>
+                    <!--<li>@Html.ActionLink("Inicio", "Index", "Home")</li>
                     <li>@Html.ActionLink("Acerca de", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contacto", "Contact", "Home")</li>
+                    <li>@Html.ActionLink("Contacto", "Contact", "Home")</li>-->
                     <li>@Html.ActionLink("Gestionar Clientes", "Index", "Clientes")</li>
                     <li>@Html.ActionLink("Gestionar Usuarios", "Index", "Usuarios")</li>
                     <li>@Html.ActionLink("Gestionar Productos", "Index", "Productos")</li>
                     <li>@Html.ActionLink("Gestionar Categorías", "Index", "Categorias")</li>
+                    <li>@Html.ActionLink("Gestionar Mesas", "Index", "Mesas")</li>
                 </ul>
             </div>
         </div>
@@ -36,7 +37,7 @@
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; @DateTime.Now.Year - Mi aplicación ASP.NET</p>
+            <p>&copy; @DateTime.Now.Year - Ariaka</p>
         </footer>
     </div>
 
