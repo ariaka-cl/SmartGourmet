@@ -4,6 +4,7 @@
         Public Property Fecha As Date
         Public Property Vendedor As Usuario
         Public Property Comprador As Cliente
+        Public Property NombreComprador As String
         Public Property Mesa As Mesa
         Public Property NroPersonas As Integer
         Public Property EstadoPedido As EstadoPedido
