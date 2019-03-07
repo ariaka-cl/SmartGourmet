@@ -6,5 +6,7 @@
         Public Property Apellido As String
         Public Property Password As String
         Public Property Rol As Rol
+
+        Public Overridable Property Ventas As IList(Of Venta)
     End Class
 End Namespace
