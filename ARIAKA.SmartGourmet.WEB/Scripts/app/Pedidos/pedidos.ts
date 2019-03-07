@@ -6,6 +6,18 @@ namespace Pedidos {
     'use strict'
     export class PedidosIndexViewModel {
         public productos: KnockoutObservableArray<any> = ko.observableArray<any>();
+        public clientes: KnockoutObservableArray<any> = ko.observableArray<any>();
+        public datosFormCliente: KnockoutObservable<any> = ko.observable<any>();
+        public idCliente: KnockoutObservable<number> = ko.observable(0);
+        public clienteExiste: KnockoutObservable<boolean> = ko.observable(false);
+        public clienteCreado: KnockoutObservable<boolean> = ko.observable(false);
+        public clienteModificado: KnockoutObservable<boolean> = ko.observable(false);
+        public switchForm: KnockoutObservable<boolean> = ko.observable(false);
+        public vendedor: KnockoutObservableArray<any> = ko.observableArray<any>();
+        public pedidos: KnockoutObservableArray<any> = ko.observableArray<any>();
+        public estPedido: KnockoutObservableArray<any> = ko.observableArray<any>();
+        public nombreEstPedido: KnockoutObservable<any> = ko.observable<any>();
+        public esDomicilio: KnockoutObservable<boolean> = ko.observable<boolean>();
         public categorias: KnockoutObservableArray<any> = ko.observableArray<any>();
         public categoriasFilter: KnockoutObservableArray<any> = ko.observableArray<any>();
         public enable: KnockoutObservable<boolean> = ko.observable(true);
@@ -15,15 +27,85 @@ namespace Pedidos {
         public imagen: KnockoutObservable<any> = ko.observable<any>();
 
         public limpiarForm() {
-            let formData: any = $('#form-productos').dxForm('option').formData;
+            let formData: any = $('#form-pedidos').dxForm('option').formData;
             formData.ID = 0;
             formData.Nombre = "";
-            formData.Precio = "";
-            formData.Descuento = "";
-            formData.StockActual = "";
-            formData.Foto = "";
-            formData.Tipo = "";
+            formData.NroPersonas = "";
+            formData.Vendedor = "";
+            formData.Fecha = Date();
+            formData.EsDomicilio = false;
+            formData.Telefono = "";
+            formData.Direccion = "";
+            formData.Observaciones = "";
         };
+
+        getClientes(): void {
+            this.clientes([]);
+            let url = 'api/clientes';
+            $.ajax({
+                type: 'GET',
+                url: url,
+            }).done((data: any) => {
+                for (var i: number = 0; i < data.length; i++) {
+                    this.clientes.push({
+                        ID: data[i].id,
+                        Nombre: data[i].nombre,
+                        Apellido: data[i].apellido,
+                        Direccion: data[i].direccion,
+                        Telefono: data[i].telefono,
+                        NombreCompleto: data[i].nombreCompleto
+                    });
+                }
+            }).fail((data: any) => {
+                DevExpress.ui.notify(data.responseJSON, "error", 3000);
+            });
+        }
+
+        addClientes(): void {
+
+            let formData: any = $('#form-pedidos').dxForm('option').formData;
+
+            if (formData.Nombre === "") {
+                DevExpress.ui.notify("No se puede crear cliente, falta nombre.", "error", 3000);
+                return;
+            }
+            if (formData.Telefono === "") {
+                DevExpress.ui.notify("No se puede crear cliente, falta teléfono.", "error", 3000);
+                return;
+            }
+            if (formData.Direccion === "") {
+                DevExpress.ui.notify("No se puede crear cliente, falta dirección.", "error", 3000);
+                return;
+            }
+
+            let nombreCompleto: any = formData.Nombre.split(" ");
+            if (nombreCompleto[1] === "" || nombreCompleto[1] === undefined || nombreCompleto[1] === null ) {
+                DevExpress.ui.notify("No se puede crear pedido, falta apellido.", "error", 3000);
+                return;
+            }
+
+            let url = 'api/clientes';
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: {
+                    ID: this.idCliente,
+                    Nombre: nombreCompleto[0],
+                    Apellido: nombreCompleto[1],
+                    Direccion: formData.Direccion,
+                    Telefono: formData.Telefono
+                }
+            }).done((data: any) => {
+                DevExpress.ui.notify("Cliente creado satisfactoriamente.", "success", 2000);
+                this.getClientes();
+                this.limpiarForm();
+                //this.idRow(0);
+                this.enable(true);
+                this.clienteCreado(true);
+            }).fail((data: any) => {
+                DevExpress.ui.notify(data.responseJSON, "error", 3000);
+            });
+        }
 
         getProductos(id: number): void {
             this.productos([]);
@@ -68,131 +150,325 @@ namespace Pedidos {
             });
         }
 
-        addProductos(): void {
+        getVendedores(): void {
+            this.vendedor([]);
+            let url = 'api/usuarios';
+            $.ajax({
+                type: 'GET',
+                url: url
+            }).done((data: any) => {
+                for (var i: number = 0; i < data.length; i++) {
+                    let user = {
+                        id: data[i].id,
+                        nombre: data[i].nombre.concat(" ", data[i].apellido)
+                    }
+                    this.vendedor.push(user);
+                }
+            }).fail((data: any) => {
+                DevExpress.ui.notify(data.responseJSON, "error", 3000);
+            });
+        }
 
-            let formData: any = $('#form-productos').dxForm('option').formData;
+        addPedidos(): void {
+
+            let formData: any = $('#form-pedidos').dxForm('option').formData;
 
             if (formData.Nombre === "") {
-                DevExpress.ui.notify("No se puede crear producto, falta nombre.", "error", 3000);
+                DevExpress.ui.notify("No se puede crear pedido, falta nombre.", "error", 3000);
                 return;
             }
-            if (formData.Precio === "") {
-                DevExpress.ui.notify("No se puede crear producto, falta precio.", "error", 3000);
+            if (formData.NroPersonas === "") {
+                DevExpress.ui.notify("No se puede crear pedido, falta número de personas.", "error", 3000);
                 return;
             }
-            if (formData.StockActual === "") {
-                DevExpress.ui.notify("No se puede crear producto, falta stock.", "error", 3000);
+            if (formData.Fecha === "") {
+                DevExpress.ui.notify("No se puede crear pedido, falta fecha.", "error", 3000);
                 return;
             }
-            if (formData.Tipo === "") {
-                DevExpress.ui.notify("No se puede crear producto, falta la categoría.", "error", 3000);
+            if (formData.Vendedor === "") {
+                DevExpress.ui.notify("No se puede crear pedido, falta vendedor.", "error", 3000);
+                return;
+            }
+            if (formData.EstadoPedido === "") {
+                DevExpress.ui.notify("No se puede crear pedido, falta el estado del pedido.", "error", 3000);
                 return;
             }
 
-            let url = 'api/productos';
+            //let nombreCompleto: any = formData.Nombre.split(" ");
+            //if (nombreCompleto[1] === "" || nombreCompleto[1] === undefined || nombreCompleto[1] === null ) {
+            //    DevExpress.ui.notify("No se puede crear pedido, falta apellido.", "error", 3000);
+            //    return;
+            //}
+
+            if (this.switchForm() == false) {
+                var compradorNull = { 'id': -1 }
+                this.datosFormCliente(compradorNull);
+            }
+
+            let url = 'api/pedidos';
             $.ajax({
                 type: 'POST',
                 url: url,
                 data: {
                     ID: formData.ID,
-                    Nombre: formData.Nombre,
-                    Precio: formData.Precio,
-                    Descuento: formData.Descuento,
-                    StockActual: formData.StockActual,
-                    Foto: formData.Foto,
-                    TipoID: formData.Tipo
+                    Fecha: formData.Fecha,
+                    NombreComprador: formData.Nombre,
+                    Comprador: this.datosFormCliente(),
+                    VendedorID: formData.Vendedor,
+                    Mesa: formData.Mesa,
+                    NroPersonas: formData.NroPersonas,
+                    EstadoPedido: formData.EstadoPedido,
+                    Observaciones: formData.Observaciones,
+                    EsDomicilio: formData.EsDomicilio
                 }
             }).done((data: any) => {
-                DevExpress.ui.notify("Datos guardados correctamente.", "success", 2000);
-                $('#form-productos').dxForm('instance').resetValues();
+                DevExpress.ui.notify("Pedido creado satisfactoriamente.", "success", 2000);
+                $('#form-pedidos').dxForm('instance').resetValues();
+                this.datosFormCliente([]);
+                this.clienteExiste(false);
+                this.clienteModificado(false);
+                this.switchForm(false);
                 this.getProductos(this.prodByCat());
                 let grid = $('#grid-productos').dxDataGrid('instance');
                 this.limpiarForm();
                 this.enable(true);
                 grid.refresh();
                 grid.repaint();
+                window.location.replace("http://localhost:61242/Mesas");
             }).fail((data: any) => {
                 DevExpress.ui.notify(data.responseJSON, "error", 3000);
             });
         }
 
         constructor() {
-            this.getProductos(this.prodByCat());
-            this.getCategorias();
-            this.imagen([]);
+            //this.getProductos(this.prodByCat());
+            this.getClientes();
+            this.getVendedores();
+            this.estPedido([]);
+            $.getJSON('api/pedidos/estados').then((result: any): void => {
+                for (var i: number = 0; i < result.tipoEstadoPedido.length; i++) {
+                    this.estPedido.push({
+                        Nombre: result.tipoEstadoPedido[i].nombre,
+                        Clave: result.tipoEstadoPedido[i].clave,
+                    });
+                }
+            });
         }
 
         formOptions: any = {
-            formData: this.productos,
-            labelLocation: "top",
+            formData: this.pedidos,
+            labelLocation: "left",
             items: [{
+                itemType: "group",
+                colCount: 2,
+                items: [{
+                    itemType: "group",
+                    colCount: 1,
+                    name: "formDomicilio",
+                    caption: "Información de Cliente",
+                    items: [{
+                        dataField: "Nombre",
+                        editorType: "dxAutocomplete",
+                        label: { text: 'Nombre Cliente' },
+                        editorOptions: {
+                            dataSource: this.clientes,
+                            valueExpr: 'NombreCompleto',
+                            displayValue: 'NombreCompleto',
+                            placeholder: 'Nombre y apellido',
+                            showClearButton: true,
+                            onItemClick: (e: any) => {
+                                var id = e.itemData["ID"];
+                                this.idCliente(id);
+                                var nombre = e.itemData["Nombre"];
+                                var apellido = e.itemData["Apellido"];
+                                var telefono = e.itemData["Telefono"];
+                                var direccion = e.itemData["Direccion"];
+                                var cliente = {
+                                    'id': id,
+                                    'nombre': nombre + " " + apellido,
+                                    'apellido': apellido,
+                                    'telefono': telefono,
+                                    'direccion': direccion
+                                };
+                                let formData: any = $('#form-pedidos').dxForm('option').formData;
+                                formData.Nombre = nombre + " " + apellido;
+                                formData.Direccion = direccion;
+                                formData.Telefono = telefono;
+                                this.datosFormCliente(cliente);
+                                this.clienteExiste(true);
+                                let form = $('#form-pedidos').dxForm('instance');
+                                form.repaint();
+                            },
+                            onFocusOut: (e: any) => {
+                                if (this.clienteExiste() == true && this.clienteModificado() == true && this.switchForm() == true) {
+                                    this.addClientes();
+                                    this.clienteModificado(false);
+                                }
+                            },
+                            onValueChanged: (e: any) => {
+                                if (this.clienteExiste() == true) {
+                                    this.clienteModificado(true);
+                                }
+                            }
+                        }
+                    }, {
+                        dataField: "NroPersonas",
+                        editorType: "dxNumberBox",
+                        label: { text: 'N° de personas' },
+                        editorOptions: {
+                            showClearButton: true,
+                            showSpinButtons: true,
+                            min: 0
+                        }
+                    }]
+                }, {
+                    itemType: "group",
+                    colCount: 1,
+                    caption: "Información de Pedido",
+                    items: [/*{
+                        dataField: "EstadoPedido",
+                        editorType: "dxSelectBox",
+                        editorOptions: {
+                            dataSource: this.estPedido,
+                            placeholder: "Seleccione estado pedido...",
+                            displayExpr: 'Nombre',
+                            valueExpr: 'Clave',
+                            value: this.nombreEstPedido
+                        }
+                    }, */{
+                        dataField: "Vendedor",
+                        editorType: "dxSelectBox",
+                        editorOptions: {
+                            dataSource: this.vendedor,
+                            placeholder: "Seleccione vendedor...",
+                            displayExpr: 'nombre',
+                            valueExpr: 'id'
+                        }
+                    }, {
+                        dataField: "Fecha",
+                        editorType: "dxDateBox",
+                        label: { text: 'Fecha' },
+                        editorOptions: {
+                            showClearButton: true,
+                            type: 'datetime',
+                            value: Date(),
+                            min: Date(),
+                            dateOutOfRangeMessage: 'Fecha fuera de rango',
+                            displayFormat: 'dd/MM/YY HH:mm',
+                            cancelButtonText: 'Cancelar',
+                            applyButtonText: 'Escoger',
+                            placeholder: 'Seleccione fecha entrega',
+                            width: "100%",
+                            onOpened: (e) => {
+                                e.component._strategy._timeView._hourBox.option('min', 8);
+                                e.component._strategy._timeView._hourBox.option('max', 20);
+                            }
+                        }
+                    }, {
+                        dataField: "EsDomicilio",
+                        editorType: "dxSwitch",
+                        editorOptions: {
+                            switchedOnText: 'SI',
+                            switchedOffText: 'NO',
+                            value: this.switchForm,
+                            onValueChanged: (e: any) => {
+                                if (e.value == true) {
+                                    var form = $('#form-pedidos').dxForm('instance')
+                                    var items = form.itemOption("formDomicilio").items;
+                                    items.push({
+                                        dataField: "Telefono",
+                                        editorType: "dxNumberBox",
+                                        label: { text: 'Teléfono' },
+                                        editorOptions: {
+                                            showClearButton: true,
+                                            mode: "tel",
+                                            onFocusOut: (e: any) => {
+                                                if (this.clienteExiste() == true && this.clienteModificado() == true && this.switchForm() == true) {
+                                                    this.addClientes();
+                                                    this.clienteModificado(false);
+                                                }
+                                            },
+                                            onValueChanged: (e: any) => {
+                                                if (this.clienteExiste() == true) {
+                                                    this.clienteModificado(true);
+                                                }
+                                            }
+                                        }
+                                    });
+                                    items.push({
+                                        dataField: "Direccion",
+                                        editorType: "dxTextBox",
+                                        label: { text: 'Direccion' },
+                                        editorOptions: {
+                                            showClearButton: true,
+                                            onFocusOut: (e: any) => {
+                                                if (this.clienteExiste() == true && this.clienteModificado() == true && this.switchForm() == true) {
+                                                    this.addClientes();
+                                                    this.clienteModificado(false);
+                                                }
+                                            },
+                                            onValueChanged: (e: any) => {
+                                                if (this.clienteExiste() == true) {
+                                                    this.clienteModificado(true);
+                                                }
+                                            }
+                                        }
+                                    });
+                                    form.repaint();
+                                }
+                                if (e.value == false) {
+                                    var form = $('#form-pedidos').dxForm('instance')
+                                    var items = form.itemOption("formDomicilio").items;
+                                    items.pop();
+                                    items.pop();
+                                    form.repaint();
+                                }
+                            }
+                        }
+                    }]
+                }]
+            }, {
                 itemType: "group",
                 colCount: 1,
                 items: [{
-                    dataField: "Nombre",
-                    editorType: "dxTextBox",
-                    label: { text: 'Nombre' },
-                    editorOptions: {
-                        showClearButton: true
-                    }
-                }, {
-                    dataField: "Precio",
-                    editorType: "dxNumberBox",
-                    editorOptions: {
-                        showClearButton: true
-                    }
-                }, {
-                    dataField: "Descuento",
-                    editorType: "dxNumberBox",
-                    editorOptions: {
-                        showClearButton: true
-                    }
-                }, {
-                    dataField: "StockActual",
-                    editorType: "dxNumberBox",
-                    label: { text: 'Stock' },
-                    editorOptions: {
-                        showClearButton: true
-                    }
-                }, {
-                    dataField: "Foto",
-                    template: (data, itemElement) => {
-                        itemElement.append($("<div>").attr("id", "dxfoto").dxFileUploader({
-                            selectButtonText: "Seleccionar imagen",
-                            labelText: "o arrastra archivo aquí",
-                            uploadMethod: 'POST',
-                            uploadMode: "useForm",
-                            accept: 'image/*',
-                            name: 'Foto',
-                            onValueChanged: (e) => {
-                                let formImg: any = $('#form-productos').dxForm('option', 'formData');
-                                if (e.value !== null) {
-                                    var fotoblob = new Blob(e.value, { type: 'image/png' });
-                                    var reader = new FileReader();
+                    itemType: "group",
+                    colCount: 1,
+                    caption: "Datos del Pedido",
+                    items: [/*{
 
-                                    reader.onload = function () {
-                                        formImg.Foto = reader.result;
-                                    };
-                                    reader.readAsDataURL(fotoblob);
-                                }
-                                else {
-                                    formImg.Foto = null;
-                                }
+                    }, */{
+                            colSpan: 2,
+                            template: function (data, container) {
+                                $("<div>").attr("id", "grid-productos").dxDataGrid({
+                                    dataSource: this.productos,
+                                    columns: [{ dataField: 'ID', visible: false },
+                                    { dataField: 'Nombre', width: "35%" },
+                                    { dataField: 'Tipo.nombre', caption: 'Categoría' },
+                                    { dataField: 'StockActual', caption: 'Stock Actual', width: "9%" },
+                                    { dataField: 'Precio', width: "8%" },
+                                    { dataField: 'Descuento', width: "9%" }],
+                                    editing: {
+                                        allowUpdating: true,
+                                        allowAdding: true,
+                                        allowDeleting: true
+                                    },
+                                }).appendTo(container);
                             }
-                        }));
-                    }
+                        }]
                 }, {
-                    dataField: "Tipo",
-                    editorType: "dxSelectBox",
-                    editorOptions: {
-                        dataSource: this.categorias,
-                        placeholder: "Seleccione una categoría...",
-                        displayExpr: 'nombre',
-                        valueExpr: 'id'
-                    }
-                }]
-            }]
-        };
+                    itemType: "group",
+                    colCount: 1,
+                    caption: "Notas adicionales",
+                    items: [{
+                        dataField: "Observaciones",
+                        label: { location: "top", text: 'Observaciones' },
+                        editorType: "dxTextArea",
+                        editorOptions: {
+                            height: 100
+                        }
+                    }]
+                }]} 
+        ]};
 
         cleanButton: any = {
             text: "Limpiar",
@@ -223,14 +499,10 @@ namespace Pedidos {
             icon: "plus",
             type: 'success',
             onClick: (e) => {
-                $('#form-productos').dxForm('instance').resetValues();
-                this.limpiarForm();
-                this.idRow(0);
+                if (this.clienteCreado() == true || this.clienteExiste() == true || this.switchForm() == false) {
+                    this.addPedidos();
+                }
                 this.enable(true);
-                let grid = $('#grid-productos').dxDataGrid('instance');
-                grid.deselectAll();
-                let popForm = $('#form-popup').dxPopup('instance');
-                popForm.show();
             }
         }
     }

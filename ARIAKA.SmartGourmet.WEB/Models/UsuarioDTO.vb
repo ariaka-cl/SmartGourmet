@@ -7,5 +7,6 @@
         Public Property Password As String
         Public Property Nombre As String
         Public Property Apellido As String
+        Public Property NombreCompleto As String
     End Class
 End Namespace

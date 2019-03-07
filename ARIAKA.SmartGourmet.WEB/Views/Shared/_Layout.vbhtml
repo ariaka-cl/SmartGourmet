@@ -29,6 +29,7 @@
                     <li>@Html.ActionLink("Gestionar Productos", "Index", "Productos")</li>
                     <li>@Html.ActionLink("Gestionar Categorías", "Index", "Categorias")</li>
                     <li>@Html.ActionLink("Gestionar Mesas", "Index", "Mesas")</li>
+                    <li>@Html.ActionLink("Gestionar Pedidos", "Index", "Pedidos")</li>
                 </ul>
             </div>
         </div>

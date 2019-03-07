@@ -123,9 +123,11 @@ namespace Mesas {
                     }
                 }, {
                     dataField: "Capacidad",
-                    editorType: "dxTextBox",
+                    editorType: "dxNumberBox",
                     editorOptions: {
-                        showClearButton: true
+                        showClearButton: true,
+                        showSpinButtons: true,
+                        min: 0
                     }
                 }, {
                     dataField: "Estado",
@@ -145,7 +147,6 @@ namespace Mesas {
             dataSource: this.mesas,
             noDataText: 'No hay datos disponibles por el momento ...',
             showScrollbar: true,
-            items: Mesas,
             height: 400,
             baseItemHeight: 120,
             baseItemWidth: 185,
@@ -196,24 +197,10 @@ namespace Mesas {
                      
          };
 
-        buttonOptionsDelete: any = {
-            text: "Borrar",
-            icon: "trash",
-            type: 'danger',
-            disabled: this.enable,
-            onClick: () => {
-                let index = this.idRow();
-                this.deleteMesas(index);
-                $('#tileview').dxTileView('instance').repaint();
-
-
-            }
-        }
-
         formPopup: any = {
             visible: false,
-            width: 500,
-            height: 510,
+            width: "550",
+            height: "auto",
             position: {
                 my: 'center',
                 at: 'center',
@@ -226,7 +213,7 @@ namespace Mesas {
             },
             toolbarItems: [{
                 toolbar: 'top',
-                text: "Añadir mesas",
+                text: "Añadir mesa",
                 location: "center"
             }, {
                 widget: "dxButton",
@@ -246,7 +233,7 @@ namespace Mesas {
         };
 
         addPopup: any = {
-            text: "Agregar",
+            text: "Agregar Mesa",
             icon: "plus",
             type: 'success',
             onClick: (e) => {
@@ -259,8 +246,20 @@ namespace Mesas {
             }
         }
 
+        deletePopup: any = {
+            text: "Eliminar Mesa",
+            icon: "trash",
+            type: 'danger',
+            disabled: this.enable,
+            onClick: () => {
+                let index = this.idRow();
+                this.deleteMesas(index);
+                $('#tileview').dxTileView('instance').repaint();
+            }
+        }
+
         modifPopup: any = {
-            text: "Modificar",
+            text: "Modificar Mesa",
             icon: "edit",
             type: 'default',
             disabled: this.enable,
