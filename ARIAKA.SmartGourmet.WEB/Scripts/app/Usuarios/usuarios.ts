@@ -87,7 +87,7 @@ namespace Usuarios {
                 $('#form-usuarios').dxForm('instance').resetValues();
                 this.getUsuarios();
                 let grid = $('#grid-usuarios').dxDataGrid('instance');
-                this.limpiarForm();
+               // this.limpiarForm();
                 this.enable(true);
                 grid.refresh();
                 grid.repaint();
@@ -289,7 +289,7 @@ namespace Usuarios {
             type: 'success',
             onClick: (e) => {
                 $('#form-usuarios').dxForm('instance').resetValues();
-                this.limpiarForm();
+                //this.limpiarForm();
                 this.idRow(0);
                 this.enable(true);
                 let popForm = $('#form-popup').dxPopup('instance');

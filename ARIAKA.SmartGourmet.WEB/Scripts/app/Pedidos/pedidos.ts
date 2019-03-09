@@ -10,8 +10,11 @@ namespace Pedidos {
         public datosFormCliente: KnockoutObservable<any> = ko.observable<any>();
         public idCliente: KnockoutObservable<number> = ko.observable(0);
         public clienteExiste: KnockoutObservable<boolean> = ko.observable(false);
-        public clienteCreado: KnockoutObservable<boolean> = ko.observable(false);
         public clienteModificado: KnockoutObservable<boolean> = ko.observable(false);
+        public disableForm: KnockoutObservable<boolean> = ko.observable(true);
+        public nombreNull: KnockoutObservable<boolean> = ko.observable(true);
+        public telefNull: KnockoutObservable<boolean> = ko.observable(true);
+        public direcNull: KnockoutObservable<boolean> = ko.observable(true);
         public switchForm: KnockoutObservable<boolean> = ko.observable(false);
         public vendedor: KnockoutObservableArray<any> = ko.observableArray<any>();
         public pedidos: KnockoutObservableArray<any> = ko.observableArray<any>();
@@ -64,23 +67,26 @@ namespace Pedidos {
         addClientes(): void {
 
             let formData: any = $('#form-pedidos').dxForm('option').formData;
-
             if (formData.Nombre === "") {
-                DevExpress.ui.notify("No se puede crear cliente, falta nombre.", "error", 3000);
+                DevExpress.ui.notify("No se puede guardar datos cliente, falta nombre.", "error", 3000);
                 return;
             }
-            if (formData.Telefono === "") {
-                DevExpress.ui.notify("No se puede crear cliente, falta teléfono.", "error", 3000);
+            if (formData.Telefono === "" || formData.Telefono === null) {
+                DevExpress.ui.notify("No se puede guardar datos cliente, falta teléfono.", "error", 3000);
                 return;
             }
-            if (formData.Direccion === "") {
-                DevExpress.ui.notify("No se puede crear cliente, falta dirección.", "error", 3000);
+            if (!(/^\d+$/.test(formData.Telefono))) {
+                DevExpress.ui.notify("No se puede guardar datos cliente, teléfono solo debe contener números.", "error", 3000);
+                return;
+            }
+            if (formData.Direccion === "" || formData.Telefono === null) {
+                DevExpress.ui.notify("No se puede guardar datos cliente, falta dirección.", "error", 3000);
                 return;
             }
 
             let nombreCompleto: any = formData.Nombre.split(" ");
             if (nombreCompleto[1] === "" || nombreCompleto[1] === undefined || nombreCompleto[1] === null ) {
-                DevExpress.ui.notify("No se puede crear pedido, falta apellido.", "error", 3000);
+                DevExpress.ui.notify("No se puede guardar datos cliente, falta apellido.", "error", 3000);
                 return;
             }
 
@@ -96,12 +102,10 @@ namespace Pedidos {
                     Telefono: formData.Telefono
                 }
             }).done((data: any) => {
-                DevExpress.ui.notify("Cliente creado satisfactoriamente.", "success", 2000);
+                DevExpress.ui.notify("Cliente guardado satisfactoriamente.", "success", 2000);
                 this.getClientes();
-                this.limpiarForm();
-                //this.idRow(0);
+                this.idCliente(data.id);
                 this.enable(true);
-                this.clienteCreado(true);
             }).fail((data: any) => {
                 DevExpress.ui.notify(data.responseJSON, "error", 3000);
             });
@@ -194,11 +198,21 @@ namespace Pedidos {
                 return;
             }
 
-            //let nombreCompleto: any = formData.Nombre.split(" ");
-            //if (nombreCompleto[1] === "" || nombreCompleto[1] === undefined || nombreCompleto[1] === null ) {
-            //    DevExpress.ui.notify("No se puede crear pedido, falta apellido.", "error", 3000);
-            //    return;
-            //}
+            if (this.switchForm() == true) {
+                let nombreCompleto: any = formData.Nombre.split(" ");
+                if (nombreCompleto[1] === "" || nombreCompleto[1] === undefined || nombreCompleto[1] === null) {
+                    DevExpress.ui.notify("No se puede crear pedido, falta apellido.", "error", 3000);
+                    return;
+                }
+                if (formData.Telefono === "" || formData.Telefono === null || formData.Telefono === undefined) {
+                    DevExpress.ui.notify("No se puede crear pedido, falta teléfono.", "error", 3000);
+                    return;
+                }
+                if (formData.Direccion === "" || formData.Telefono === null || formData.Telefono === undefined) {
+                    DevExpress.ui.notify("No se puede crear pedido, falta dirección.", "error", 3000);
+                    return;
+                }
+            }
 
             if (this.switchForm() == false) {
                 var compradorNull = { 'id': -1 }
@@ -272,6 +286,7 @@ namespace Pedidos {
                         label: { text: 'Nombre Cliente' },
                         editorOptions: {
                             dataSource: this.clientes,
+                            validationError: { message: "Falta agregar el apellido." },
                             valueExpr: 'NombreCompleto',
                             displayValue: 'NombreCompleto',
                             placeholder: 'Nombre y apellido',
@@ -296,6 +311,7 @@ namespace Pedidos {
                                 formData.Telefono = telefono;
                                 this.datosFormCliente(cliente);
                                 this.clienteExiste(true);
+                                this.disableForm(false);
                                 let form = $('#form-pedidos').dxForm('instance');
                                 form.repaint();
                             },
@@ -304,10 +320,40 @@ namespace Pedidos {
                                     this.addClientes();
                                     this.clienteModificado(false);
                                 }
+                                if (this.clienteExiste() == false && this.clienteModificado() == false && this.switchForm() == true) {
+                                    if (this.nombreNull() == false && this.telefNull() == false && this.direcNull() == false) {
+                                        this.addClientes();
+                                        this.clienteExiste(true);
+                                    }
+                                }
                             },
                             onValueChanged: (e: any) => {
                                 if (this.clienteExiste() == true) {
                                     this.clienteModificado(true);
+                                }
+                                if (e.value !== null && this.switchForm() == true) {
+                                    let nombreCompleto: any = e.value.split(" ");
+                                    if (nombreCompleto[1] === "" || nombreCompleto[1] === undefined || nombreCompleto[1] === null) {
+                                        this.disableForm(true);
+                                        e.component.option('isValid', false);
+                                        let form: any = $('#form-pedidos').dxForm('instance');
+                                        let direcc: any = form.getEditor('Direccion');
+                                        direcc.repaint();
+                                    }
+                                    else {
+                                        this.nombreNull(false);
+                                        e.component.option('isValid', true);
+                                        this.disableForm(false);
+                                        let form: any = $('#form-pedidos').dxForm('instance');
+                                        let direcc: any = form.getEditor('Direccion');
+                                        direcc.repaint();
+                                    }
+                                } else if (this.switchForm() == true){
+                                    this.nombreNull(true);
+                                    this.disableForm(true);
+                                    let form: any = $('#form-pedidos').dxForm('instance');
+                                    let direcc: any = form.getEditor('Direccion');
+                                    direcc.repaint();
                                 }
                             }
                         }
@@ -377,20 +423,57 @@ namespace Pedidos {
                                     var items = form.itemOption("formDomicilio").items;
                                     items.push({
                                         dataField: "Telefono",
-                                        editorType: "dxNumberBox",
+                                        editorType: "dxAutocomplete",
                                         label: { text: 'Teléfono' },
                                         editorOptions: {
+                                            dataSource: this.clientes,
+                                            valueExpr: 'Telefono',
+                                            displayValue: 'Telefono',
                                             showClearButton: true,
-                                            mode: "tel",
+                                            onItemClick: (e: any) => {
+                                                var id = e.itemData["ID"];
+                                                this.idCliente(id);
+                                                var nombre = e.itemData["Nombre"];
+                                                var apellido = e.itemData["Apellido"];
+                                                var telefono = e.itemData["Telefono"];
+                                                var direccion = e.itemData["Direccion"];
+                                                var cliente = {
+                                                    'id': id,
+                                                    'nombre': nombre + " " + apellido,
+                                                    'apellido': apellido,
+                                                    'telefono': telefono,
+                                                    'direccion': direccion
+                                                };
+                                                let formData: any = $('#form-pedidos').dxForm('option').formData;
+                                                formData.Nombre = nombre + " " + apellido;
+                                                formData.Direccion = direccion;
+                                                formData.Telefono = telefono;
+                                                this.datosFormCliente(cliente);
+                                                this.clienteExiste(true);
+                                                this.disableForm(false);
+                                                let form = $('#form-pedidos').dxForm('instance');
+                                                form.repaint();
+                                            },
                                             onFocusOut: (e: any) => {
                                                 if (this.clienteExiste() == true && this.clienteModificado() == true && this.switchForm() == true) {
                                                     this.addClientes();
                                                     this.clienteModificado(false);
                                                 }
+                                                if (this.clienteExiste() == false && this.clienteModificado() == false && this.switchForm() == true) {
+                                                    if (this.nombreNull() == false && this.telefNull() == false && this.direcNull() == false) {
+                                                        this.addClientes();
+                                                        this.clienteExiste(true);
+                                                    }
+                                                }
                                             },
                                             onValueChanged: (e: any) => {
                                                 if (this.clienteExiste() == true) {
                                                     this.clienteModificado(true);
+                                                }
+                                                if (e.value == null || e.value == "" || e.value == undefined) {
+                                                    this.telefNull(true);
+                                                } else {
+                                                    this.telefNull(false);
                                                 }
                                             }
                                         }
@@ -401,15 +484,27 @@ namespace Pedidos {
                                         label: { text: 'Direccion' },
                                         editorOptions: {
                                             showClearButton: true,
+                                            disabled: this.disableForm,
                                             onFocusOut: (e: any) => {
                                                 if (this.clienteExiste() == true && this.clienteModificado() == true && this.switchForm() == true) {
                                                     this.addClientes();
                                                     this.clienteModificado(false);
                                                 }
+                                                if (this.clienteExiste() == false && this.clienteModificado() == false && this.switchForm() == true) {
+                                                    if (this.nombreNull() == false && this.telefNull() == false && this.direcNull() == false) {
+                                                        this.addClientes();
+                                                        this.clienteExiste(true);
+                                                    }
+                                                }
                                             },
                                             onValueChanged: (e: any) => {
                                                 if (this.clienteExiste() == true) {
                                                     this.clienteModificado(true);
+                                                }
+                                                if (e.value == null || e.value == "" || e.value == undefined) {
+                                                    this.direcNull(true);
+                                                } else {
+                                                    this.direcNull(false);
                                                 }
                                             }
                                         }
@@ -419,6 +514,16 @@ namespace Pedidos {
                                 if (e.value == false) {
                                     var form = $('#form-pedidos').dxForm('instance')
                                     var items = form.itemOption("formDomicilio").items;
+                                    this.clienteExiste(false);
+                                    this.clienteModificado(false);
+                                    this.datosFormCliente([]);
+                                    this.idCliente(0);
+                                    this.telefNull(true);
+                                    this.direcNull(true);
+                                    let formData: any = $('#form-pedidos').dxForm('option').formData;
+                                    formData.Direccion = "";
+                                    formData.Telefono = "";
+                                    this.disableForm(true);
                                     items.pop();
                                     items.pop();
                                     form.repaint();
@@ -499,9 +604,7 @@ namespace Pedidos {
             icon: "plus",
             type: 'success',
             onClick: (e) => {
-                if (this.clienteCreado() == true || this.clienteExiste() == true || this.switchForm() == false) {
-                    this.addPedidos();
-                }
+                this.addPedidos();
                 this.enable(true);
             }
         }

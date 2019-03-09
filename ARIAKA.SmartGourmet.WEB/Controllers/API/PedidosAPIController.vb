@@ -42,7 +42,7 @@ Namespace Controllers.API
                                                 .Vendedor = db.Usuarios.Where(Function(u) u.ID = model.VendedorID).SingleOrDefault(),
                                                 .Comprador = db.Clientes.Where(Function(c) c.ID = model.Comprador.ID).SingleOrDefault(),
                                                 .NombreComprador = model.NombreComprador,
-                                                .Mesa = db.Mesas.Where(Function(m) m.ID = 11).SingleOrDefault(),
+                                                .Mesa = db.Mesas.Where(Function(m) m.ID = 13).SingleOrDefault(),
                                                 .NroPersonas = model.NroPersonas,
                                                 .EstadoPedido = model.EstadoPedido,
                                                 .Observaciones = model.Observaciones,

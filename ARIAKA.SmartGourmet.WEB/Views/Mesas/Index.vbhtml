@@ -11,6 +11,12 @@ End Code
     <div class="dx-field" style="display: none;">
         <div id="form-mesas" data-bind="dxForm: formOptions"></div>
     </div>
+    <div class="dx-field" style="display: none;">
+        <div id="form-modif-mesas" data-bind="dxForm: formModifOptions"></div>
+    </div>
+    <div class="dx-field" style="display: none;">
+        <div id="form-delete-mesas" data-bind="dxForm: formDeleteOptions"></div>
+    </div>
 
     <div class="dx-field">
         <div id="botonesDetalle" class="btn-group" role="group" style="float:right;">
@@ -28,6 +34,12 @@ End Code
 
     <div class="dx-field">
         <div id="form-popup" data-bind="dxPopup: formPopup"></div>
+    </div>    
+    <div class="dx-field">
+        <div id="form-modif-popup" data-bind="dxPopup: formModifPopup"></div>
+    </div>    
+    <div class="dx-field">
+        <div id="form-delete-popup" data-bind="dxPopup: formDeletePopup"></div>
     </div>
 </div>
 

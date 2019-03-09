@@ -6,6 +6,8 @@ namespace Mesas {
     'use strict'
     export class MesasIndexViewModel {
         public mesas: KnockoutObservableArray<any> = ko.observableArray<any>();
+        public tipoForm: KnockoutObservable<any> = ko.observable<any>();
+        public idMesa: KnockoutObservable<any> = ko.observable<any>();
         public enable: KnockoutObservable<boolean> = ko.observable(true);
         public tipoEstados: KnockoutObservableArray<any> = ko.observableArray<any>();
         public idRowIndex: KnockoutObservable<number> = ko.observable(-1);
@@ -18,6 +20,11 @@ namespace Mesas {
             formData.NumMesa = "";
             formData.Capacidad = "";
             formData.Estado = "";
+            let formModifData: any = $('#form-modif-mesas').dxForm('option').formData;
+            formModifData.ID = 0;
+            formModifData.NumMesa = "";
+            formModifData.Capacidad = "";
+            formModifData.Estado = "";
         };
 
         getMesas(): void {
@@ -42,7 +49,13 @@ namespace Mesas {
 
         addMesas(): void {
 
-            let formData: any = $('#form-mesas').dxForm('option').formData;
+            if (this.tipoForm() == "add") {
+                var formData: any = $('#form-mesas').dxForm('option').formData;
+            }
+
+            if (this.tipoForm() == "modif") {
+                var formData: any = $('#form-modif-mesas').dxForm('option').formData;
+            }
 
             if (formData.NumMesa == "" || formData.NumMesa == null || formData.NumMesa == undefined) {
                 DevExpress.ui.notify("No se puede crear número de mesa, falta número", "error", 3000);
@@ -72,8 +85,12 @@ namespace Mesas {
             }).done((data: any) => {
                 DevExpress.ui.notify("Datos guardados correctamente.", "success", 2000);
                 $('#form-mesas').dxForm('instance').resetValues();
+                $('#form-modif-mesas').dxForm('instance').resetValues();
+                this.tipoForm([])
                 this.getMesas();
                 this.limpiar();
+                $('#form-modif-mesas').dxForm('instance').repaint();
+                $('#form-delete-mesas').dxForm('instance').repaint();
                 this.enable(true);           
             }).fail((data: any) => {
                 DevExpress.ui.notify(data.responseJSON, "error", 3000);
@@ -88,7 +105,8 @@ namespace Mesas {
             }).done((data: any) => {
                 $('#form-mesas').dxForm('instance').resetValues();
                 this.getMesas();
-                this.limpiar();
+                $('#form-modif-mesas').dxForm('instance').repaint();
+                $('#form-delete-mesas').dxForm('instance').repaint();
                 this.enable(true);
                 DevExpress.ui.notify("Mesa eliminada satisfactoriamente", "success", 3000);
             }).fail((data: any) => {
@@ -114,7 +132,7 @@ namespace Mesas {
             labelLocation: "top",
             items: [{
                 itemType: "group",
-                colCount: 3,
+                colCount: 1,
                 items: [{
                     dataField: "NumMesa",
                     editorType: "dxTextBox",
@@ -122,23 +140,109 @@ namespace Mesas {
                         showClearButton: true
                     }
                 }, {
-                    dataField: "Capacidad",
-                    editorType: "dxNumberBox",
+                    itemType: "group",
+                    colCount: 3,
+                    items: [{
+                        dataField: "Capacidad",
+                        editorType: "dxNumberBox",
+                        colSpan: 1,
+                        editorOptions: {
+                            showSpinButtons: true,
+                            min: 0
+                        }
+                    }, {
+                        dataField: "Estado",
+                        editorType: "dxSelectBox",
+                        colSpan: 2,
+                        editorOptions: {
+                            dataSource: this.tipoEstados,
+                            placeholder: "Seleccionar...",
+                            displayExpr: 'Nombre',
+                            valueExpr: 'Clave'
+                        }
+                    }]
+                }]
+            }]
+        };
+
+        formModifOptions: any = {
+            formData: this.mesas,
+            labelLocation: "top",
+            items: [{
+                itemType: "group",
+                colCount: 1,
+                items: [{
+                    editorType: "dxSelectBox",
+                    label: { text: 'Seleccionar mesa' },
                     editorOptions: {
-                        showClearButton: true,
-                        showSpinButtons: true,
-                        min: 0
+                        dataSource: this.mesas,
+                        placeholder: "Seleccionar...",
+                        displayExpr: 'NumMesa',
+                        onItemClick: (e) => {
+                            let mesaData: any = {
+                                ID: e.itemData.ID,
+                                NumMesa: e.itemData.NumMesa,
+                                Capacidad: e.itemData.Capacidad,
+                                Estado: e.itemData.Estado
+                            }
+                            let formData: any = $('#form-modif-mesas').dxForm('option');
+                            formData.formData = mesaData;
+                            let form = $('#form-modif-mesas').dxForm('instance');
+                            form.repaint();
+                            this.enable(false);
+                        }
                     }
                 }, {
-                    dataField: "Estado",
-                    editorType: "dxSelectBox",
+                    dataField: "NumMesa",
+                    editorType: "dxTextBox",
+                    label: { text: 'Nombre Mesa' },
                     editorOptions: {
-                        dataSource: this.tipoEstados,
-                        placeholder: "Seleccionar...",
-                        displayExpr: 'Nombre',
-                        valueExpr: 'Clave'
-                     }
+                        showClearButton: true
+                    }
+                }, {
+                    itemType: "group",
+                    colCount: 3,
+                    items: [{
+                        dataField: "Capacidad",
+                        editorType: "dxNumberBox",
+                        colSpan: 1,
+                        editorOptions: {
+                            showSpinButtons: true,
+                            min: 0
+                        }
+                    }, {
+                        dataField: "Estado",
+                        editorType: "dxSelectBox",
+                        colSpan: 2,
+                        editorOptions: {
+                            dataSource: this.tipoEstados,
+                            placeholder: "Seleccionar...",
+                            displayExpr: 'Nombre',
+                            valueExpr: 'Clave'
+                        }
+                    }]
                 }]
+            }]
+        };
+
+        formDeleteOptions: any = {
+            formData: this.mesas,
+            labelLocation: "top",
+            itemType: "group",
+            colCount: 1,
+            items: [{
+                dataField: "ID",
+                editorType: "dxSelectBox",
+                label: { text: 'Seleccionar mesa a eliminar' },
+                editorOptions: {
+                    dataSource: this.mesas,
+                    placeholder: "Seleccionar...",
+                    displayExpr: 'NumMesa',
+                    valueExpr: 'ID',
+                    onItemClick: (e) => {
+                        this.enable(false);
+                    }
+                }
             }]
         };
 
@@ -199,7 +303,7 @@ namespace Mesas {
 
         formPopup: any = {
             visible: false,
-            width: "550",
+            width: "300",
             height: "auto",
             position: {
                 my: 'center',
@@ -224,8 +328,83 @@ namespace Mesas {
                     icon: "plus",
                     type: 'success',
                     onClick: () => {
+                        this.tipoForm("add");
                         this.addMesas();
                         let popForm = $('#form-popup').dxPopup('instance');
+                        popForm.hide();
+                    }
+                }
+            }]
+        };
+
+        formModifPopup: any = {
+            visible: false,
+            width: "300",
+            height: "auto",
+            position: {
+                my: 'center',
+                at: 'center',
+                of: window
+            },
+            dragEnabled: true,
+            closeOnOutsideClick: true,
+            contentTemplate: (e) => {
+                return $('#form-modif-mesas')
+            },
+            toolbarItems: [{
+                toolbar: 'top',
+                text: "Modificar mesa",
+                location: "center"
+            }, {
+                widget: "dxButton",
+                toolbar: 'bottom',
+                location: "after",
+                options: {
+                    text: "Modificar",
+                    icon: "edit",
+                    type: 'default',
+                    disabled: this.enable,
+                    onClick: () => {
+                        this.tipoForm("modif");
+                        this.addMesas();
+                        let popForm = $('#form-modif-popup').dxPopup('instance');
+                        popForm.hide();
+                    }
+                }
+            }]
+        };
+
+        formDeletePopup: any = {
+            visible: false,
+            width: "300",
+            height: "auto",
+            position: {
+                my: 'center',
+                at: 'center',
+                of: window
+            },
+            dragEnabled: true,
+            closeOnOutsideClick: true,
+            contentTemplate: (e) => {
+                return $('#form-delete-mesas')
+            },
+            toolbarItems: [{
+                toolbar: 'top',
+                text: "Eliminar mesa",
+                location: "center"
+            }, {
+                widget: "dxButton",
+                toolbar: 'bottom',
+                location: "after",
+                options: {
+                    text: "Eliminar",
+                    icon: "trash",
+                    type: 'danger',
+                    disabled: this.enable,
+                    onClick: () => {
+                        let formData: any = $('#form-delete-mesas').dxForm('option').formData;
+                        this.deleteMesas(formData.ID);
+                        let popForm = $('#form-delete-popup').dxPopup('instance');
                         popForm.hide();
                     }
                 }
@@ -250,11 +429,14 @@ namespace Mesas {
             text: "Eliminar Mesa",
             icon: "trash",
             type: 'danger',
-            disabled: this.enable,
             onClick: () => {
-                let index = this.idRow();
-                this.deleteMesas(index);
-                $('#tileview').dxTileView('instance').repaint();
+                //let index = this.idRow();
+                //this.deleteMesas(index);
+                //$('#tileview').dxTileView('instance').repaint();
+                $('#form-delete-mesas').dxForm('instance').resetValues();
+                this.enable(true);
+                let popForm = $('#form-delete-popup').dxPopup('instance');
+                popForm.show();
             }
         }
 
@@ -262,9 +444,11 @@ namespace Mesas {
             text: "Modificar Mesa",
             icon: "edit",
             type: 'default',
-            disabled: this.enable,
             onClick: (e) => {
-                let popForm = $('#form-popup').dxPopup('instance');
+                $('#form-modif-mesas').dxForm('instance').resetValues();
+                this.limpiar();
+                this.enable(true);
+                let popForm = $('#form-modif-popup').dxPopup('instance');
                 popForm.show();
             }
         }
