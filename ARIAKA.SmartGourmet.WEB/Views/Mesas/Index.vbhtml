@@ -32,15 +32,10 @@ End Code
         <div id="tileview" data-bind="dxTileView:tileview"></div>
     </div>
 
-    <div class="dx-field">
-        <div id="form-popup" data-bind="dxPopup: formPopup"></div>
-    </div>    
-    <div class="dx-field">
-        <div id="form-modif-popup" data-bind="dxPopup: formModifPopup"></div>
-    </div>    
-    <div class="dx-field">
-        <div id="form-delete-popup" data-bind="dxPopup: formDeletePopup"></div>
-    </div>
+    <div id="form-popup" data-bind="dxPopup: formPopup"></div>
+    <div id="form-modif-popup" data-bind="dxPopup: formModifPopup"></div>
+    <div id="form-delete-popup" data-bind="dxPopup: formDeletePopup"></div>   
+    <div id="form-info-popup" class="form-info-popup"></div>
 </div>
 
 @section scripts

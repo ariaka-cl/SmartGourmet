@@ -22,7 +22,8 @@ Namespace Controllers.API
                                     .ID = mesa.ID,
                                     .NumMesa = mesa.NumMesa,
                                     .Capacidad = mesa.Capacidad,
-                                    .Estado = mesa.Estado
+                                    .Estado = mesa.Estado,
+                                    .EstadoStr = mesa.Estado.ToString
                      })
                 Next
                 Return Me.Ok(listMesaDto)
@@ -76,6 +77,7 @@ Namespace Controllers.API
             Dim db As New SGContext
             Try
                 Dim mesa As Mesa = db.Mesas.Where(Function(u) u.ID = id).SingleOrDefault()
+                If mesa.Pedidos.Count > 0 Then Return Me.Content(HttpStatusCode.NotFound, "No se puede eliminar mesa, debido a posibles pedidos asociados.")
                 db.Mesas.Remove(mesa)
                 db.SaveChanges()
                 Return Me.Content(HttpStatusCode.OK, String.Format("Mesa Eliminada {0}", id))
@@ -91,7 +93,7 @@ Namespace Controllers.API
         Public Function GetEstados() As IHttpActionResult
             Dim tipoEstado As New List(Of Models.EstadoDTO)
 
-            tipoEstado = (From v As Integer In TryCast(System.Enum.GetValues(GetType(EstadoPedido)), Integer()) Select New Models.EstadoDTO With {.Clave = v, .Nombre = System.Enum.GetName(GetType(EstadoPedido), v)}).ToList()
+            tipoEstado = (From v As Integer In TryCast(System.Enum.GetValues(GetType(TipoEstado)), Integer()) Select New Models.EstadoDTO With {.Clave = v, .Nombre = System.Enum.GetName(GetType(TipoEstado), v)}).ToList()
 
             Return Me.Ok(New With {.tipoEstado = tipoEstado})
         End Function

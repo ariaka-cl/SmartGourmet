@@ -1,7 +1,10 @@
 ﻿/// <reference path="../../typings/devextreme/devextreme.d.ts" />
 /// <reference path="../../typings/jquery/jquery.d.ts" />
 /// <reference path="../../typings/knockout/knockout.d.ts" />
-
+//  --- FALTA QUE SE MANTENGA LA ID AL GUARDAR UN CLIENTE NUEVO, PARA LUEGO MODIFICAR EL MISMO
+//  --- Y FALTA QUE TELEFONO SEA AUTOCOMPLETE, CON REPAINT DEL FORM Y SUS DATOS.
+//  --- AGREGAR VALIDACION CUADRITO ROJO APELLIDO
+// preguntar: Si se selecciona un nombre, se carga su ID, sus datos, etc. Al borrar el nombre completo,reseteo el ID CLIENTe? o Mantengo el ID para modificar ese cliente. OPCION ( CREAR BOTON LIMPIAR CLIENTE )
 namespace Pedidos {
     'use strict'
     export class PedidosIndexViewModel {
@@ -105,6 +108,14 @@ namespace Pedidos {
                 DevExpress.ui.notify("Cliente guardado satisfactoriamente.", "success", 2000);
                 this.getClientes();
                 this.idCliente(data.id);
+                let cliente = {
+                    'id': data.id,
+                    'nombre': data.nombre + " " + data.apellido,
+                    'apellido': data.apellido,
+                    'telefono': data.telefono,
+                    'direccion': data.direccion
+                };
+                this.datosFormCliente(cliente);
                 this.enable(true);
             }).fail((data: any) => {
                 DevExpress.ui.notify(data.responseJSON, "error", 3000);
@@ -177,6 +188,7 @@ namespace Pedidos {
 
             let formData: any = $('#form-pedidos').dxForm('option').formData;
 
+
             if (formData.Nombre === "") {
                 DevExpress.ui.notify("No se puede crear pedido, falta nombre.", "error", 3000);
                 return;
@@ -198,6 +210,8 @@ namespace Pedidos {
                 return;
             }
 
+            formData.Fecha = new Date(formData.Fecha).toISOString();
+
             if (this.switchForm() == true) {
                 let nombreCompleto: any = formData.Nombre.split(" ");
                 if (nombreCompleto[1] === "" || nombreCompleto[1] === undefined || nombreCompleto[1] === null) {
@@ -208,7 +222,7 @@ namespace Pedidos {
                     DevExpress.ui.notify("No se puede crear pedido, falta teléfono.", "error", 3000);
                     return;
                 }
-                if (formData.Direccion === "" || formData.Telefono === null || formData.Telefono === undefined) {
+                if (formData.Direccion === "" || formData.Direccion === null || formData.Direccion === undefined) {
                     DevExpress.ui.notify("No se puede crear pedido, falta dirección.", "error", 3000);
                     return;
                 }
@@ -218,26 +232,29 @@ namespace Pedidos {
                 var compradorNull = { 'id': -1 }
                 this.datosFormCliente(compradorNull);
             }
+            let idmesa = { 'id': window.localStorage.getItem('idmesa') };
 
             let url = 'api/pedidos';
             $.ajax({
                 type: 'POST',
                 url: url,
                 data: {
-                    ID: formData.ID,
+                    ID: window.localStorage.getItem('idpedido'),
                     Fecha: formData.Fecha,
                     NombreComprador: formData.Nombre,
                     Comprador: this.datosFormCliente(),
                     VendedorID: formData.Vendedor,
-                    Mesa: formData.Mesa,
+                    Mesa: idmesa,
                     NroPersonas: formData.NroPersonas,
                     EstadoPedido: formData.EstadoPedido,
                     Observaciones: formData.Observaciones,
                     EsDomicilio: formData.EsDomicilio
                 }
             }).done((data: any) => {
-                DevExpress.ui.notify("Pedido creado satisfactoriamente.", "success", 2000);
+                DevExpress.ui.notify("Pedido guardado satisfactoriamente.", "success", 2000);
                 $('#form-pedidos').dxForm('instance').resetValues();
+                window.localStorage.removeItem('idmesa');
+                window.localStorage.removeItem('idpedido');
                 this.datosFormCliente([]);
                 this.clienteExiste(false);
                 this.clienteModificado(false);
@@ -248,7 +265,7 @@ namespace Pedidos {
                 this.enable(true);
                 grid.refresh();
                 grid.repaint();
-                window.location.replace("http://localhost:61242/Mesas");
+                setTimeout(function () { window.location.replace(window.location.origin + '/Mesas') }, 1000);
             }).fail((data: any) => {
                 DevExpress.ui.notify(data.responseJSON, "error", 3000);
             });
@@ -401,13 +418,14 @@ namespace Pedidos {
                             min: Date(),
                             dateOutOfRangeMessage: 'Fecha fuera de rango',
                             displayFormat: 'dd/MM/YY HH:mm',
+                            dateSerializationFormat: "yyyy-MM-ddTHH:mm:ssZ",
                             cancelButtonText: 'Cancelar',
                             applyButtonText: 'Escoger',
                             placeholder: 'Seleccione fecha entrega',
                             width: "100%",
                             onOpened: (e) => {
                                 e.component._strategy._timeView._hourBox.option('min', 8);
-                                e.component._strategy._timeView._hourBox.option('max', 20);
+                                e.component._strategy._timeView._hourBox.option('max', 23);
                             }
                         }
                     }, {
