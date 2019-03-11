@@ -20,7 +20,9 @@ namespace Pedidos {
         public direcNull: KnockoutObservable<boolean> = ko.observable(true);
         public switchForm: KnockoutObservable<boolean> = ko.observable(false);
         public vendedor: KnockoutObservableArray<any> = ko.observableArray<any>();
-        public pedidos: KnockoutObservableArray<any> = ko.observableArray<any>();
+        public pedidoExiste: KnockoutObservableArray<any> = ko.observableArray<any>();
+        public fechaPedido: KnockoutObservable<any> = ko.observable<any>(Date());
+        public nombreVendedor: KnockoutObservable<any> = ko.observable<any>();
         public estPedido: KnockoutObservableArray<any> = ko.observableArray<any>();
         public nombreEstPedido: KnockoutObservable<any> = ko.observable<any>();
         public esDomicilio: KnockoutObservable<boolean> = ko.observable<boolean>();
@@ -145,6 +147,47 @@ namespace Pedidos {
             });
         }
 
+        getPedidoByID(id: any): void {
+            this.pedidoExiste([]);
+            let url = 'api/pedidos/modificar/' + id;
+            $.ajax({
+                type: 'GET',
+                url: url,
+            }).done((data: any) => {
+                //for (var i: number = 0; i < data.length; i++) {
+                //    this.pedidoExiste.push({
+                //        ID: data[i].id,
+                //        Fecha: data[i].fecha,
+                //        NroPersonas: data[i].nroPersonas,
+                //        EstadoPedido: data[i].estadoPedido,
+                //        EstadoPedidoStr: data[i].estadoPedidoStr,
+                //        EsDomicilio: data[i].esDomicilio,
+                //        Mesa: data[i].mesa,
+                //        Vendedor: data[i].vendedor,
+                //        NombreComprador: data[i].nombreComprador,
+                //        Observaciones: data[i].observaciones
+                //    });
+                //}
+                let formData: any = $('#form-pedidos').dxForm('option');
+                let pedidoData: any = {
+                    ID: data[0].id,
+                    Fecha: data[0].fecha,
+                    NroPersonas: data[0].nroPersonas,
+                    EstadoPedido: data[0].estadoPedido,
+                    EstadoPedidoStr: data[0].estadoPedidoStr,
+                    Mesa: data[0].mesa,
+                    Vendedor: data[0].vendedor.id,
+                    Nombre: data[0].nombreComprador,
+                    Observaciones: data[0].observaciones
+                }
+                this.nombreVendedor(data[0].vendedor.id);
+                this.fechaPedido(data[0].fecha);
+                formData.formData = pedidoData;
+                let form = $('#form-pedidos').dxForm('instance');
+                form.repaint();
+            })
+        }
+
         getCategorias(): void {
             this.categorias([]);
             let url = 'api/categorias';
@@ -188,27 +231,30 @@ namespace Pedidos {
 
             let formData: any = $('#form-pedidos').dxForm('option').formData;
 
+            if (formData.Fecha instanceof Function) {
+                formData.Fecha = formData.Fecha();
+            }
 
-            if (formData.Nombre === "") {
+            if (formData.Nombre === "" || formData.Nombre === null || formData.Nombre === undefined) {
                 DevExpress.ui.notify("No se puede crear pedido, falta nombre.", "error", 3000);
                 return;
             }
-            if (formData.NroPersonas === "") {
+            if (formData.NroPersonas === "" || formData.NroPersonas === null || formData.NroPersonas === undefined) {
                 DevExpress.ui.notify("No se puede crear pedido, falta número de personas.", "error", 3000);
                 return;
             }
-            if (formData.Fecha === "") {
+            if (formData.Fecha === "" || formData.Fecha === null || formData.Fecha === undefined) {
                 DevExpress.ui.notify("No se puede crear pedido, falta fecha.", "error", 3000);
                 return;
             }
-            if (formData.Vendedor === "") {
+            if (formData.Vendedor === "" || formData.Vendedor === null || formData.Vendedor == undefined) {
                 DevExpress.ui.notify("No se puede crear pedido, falta vendedor.", "error", 3000);
                 return;
             }
-            if (formData.EstadoPedido === "") {
-                DevExpress.ui.notify("No se puede crear pedido, falta el estado del pedido.", "error", 3000);
-                return;
-            }
+            //if (formData.EstadoPedido === "" || formData.EstadoPedido === null || formData.EstadoPedido === undefined) {
+            //    DevExpress.ui.notify("No se puede crear pedido, falta el estado del pedido.", "error", 3000);
+            //    return;
+            //}
 
             formData.Fecha = new Date(formData.Fecha).toISOString();
 
@@ -231,8 +277,12 @@ namespace Pedidos {
             if (this.switchForm() == false) {
                 var compradorNull = { 'id': -1 }
                 this.datosFormCliente(compradorNull);
+                //let idmesa = { 'id': window.localStorage.getItem('idmesa') };
             }
             let idmesa = { 'id': window.localStorage.getItem('idmesa') };
+            //if (this.switchForm() == true) {
+            //    var idmesa = { 'id': -1 };
+            //}
 
             let url = 'api/pedidos';
             $.ajax({
@@ -284,10 +334,13 @@ namespace Pedidos {
                     });
                 }
             });
+            if (window.localStorage.getItem("idpedido") !== null) {
+                this.getPedidoByID(window.localStorage.getItem("idpedido"));
+            }
         }
 
         formOptions: any = {
-            formData: this.pedidos,
+            formData: this.pedidoExiste,
             labelLocation: "left",
             items: [{
                 itemType: "group",
@@ -405,7 +458,8 @@ namespace Pedidos {
                             dataSource: this.vendedor,
                             placeholder: "Seleccione vendedor...",
                             displayExpr: 'nombre',
-                            valueExpr: 'id'
+                            valueExpr: 'id',
+                            value: this.nombreVendedor()
                         }
                     }, {
                         dataField: "Fecha",
@@ -414,14 +468,14 @@ namespace Pedidos {
                         editorOptions: {
                             showClearButton: true,
                             type: 'datetime',
-                            value: Date(),
+                            value: this.fechaPedido,
                             min: Date(),
                             dateOutOfRangeMessage: 'Fecha fuera de rango',
                             displayFormat: 'dd/MM/YY HH:mm',
                             dateSerializationFormat: "yyyy-MM-ddTHH:mm:ssZ",
                             cancelButtonText: 'Cancelar',
                             applyButtonText: 'Escoger',
-                            placeholder: 'Seleccione fecha entrega',
+                            placeholder: "Seleccione fecha pedido..",
                             width: "100%",
                             onOpened: (e) => {
                                 e.component._strategy._timeView._hourBox.option('min', 8);
@@ -555,11 +609,27 @@ namespace Pedidos {
                 colCount: 1,
                 items: [{
                     itemType: "group",
-                    colCount: 1,
+                    colCount: 3,
                     caption: "Datos del Pedido",
-                    items: [/*{
-
-                    }, */{
+                    items: [{
+                            colSpan: 1,
+                            template: function (data, container) {
+                                $("<div>").attr("id", "grid-productos").dxDataGrid({
+                                    dataSource: this.productos,
+                                    columns: [{ dataField: 'ID', visible: false },
+                                    { dataField: 'Nombre', width: "35%" },
+                                    { dataField: 'Tipo.nombre', caption: 'Categoría' },
+                                    { dataField: 'StockActual', caption: 'Stock Actual', width: "9%" },
+                                    { dataField: 'Precio', width: "8%" },
+                                    { dataField: 'Descuento', width: "9%" }],
+                                    editing: {
+                                        allowUpdating: true,
+                                        allowAdding: true,
+                                        allowDeleting: true
+                                    },
+                                }).appendTo(container);
+                            }
+                        }, {
                             colSpan: 2,
                             template: function (data, container) {
                                 $("<div>").attr("id", "grid-productos").dxDataGrid({
