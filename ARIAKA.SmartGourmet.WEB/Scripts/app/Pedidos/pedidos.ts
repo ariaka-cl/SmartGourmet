@@ -646,7 +646,6 @@ namespace Pedidos {
                                     collapsibleGroups: true,
                                     groupTemplate: function (data) {
                                         return $("<div>Assigned: " + data.key + "</div>");
-
                                     }
                                 }).appendTo(container);
                             }
