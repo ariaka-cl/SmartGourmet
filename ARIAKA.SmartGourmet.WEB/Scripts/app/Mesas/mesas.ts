@@ -344,17 +344,19 @@ namespace Mesas {
                             showTitle: true,
                             contentTemplate: function () {
                                 if (data[0] !== undefined) {
-                                    return $("<div />").append(
+                                    return $("<div />").css("padding", "20px").append(
                                         $("<p><b>Nombre Mesa:</b> <span>" + mesaData.NumMesa + "</span></p>"),
                                         $("<p><b>Capacidad:</b> <span>" + mesaData.Capacidad + "</span></p>"),
                                         $("<p><b>Estado Mesa:</b> <span>" + mesaData.EstadoStr + "</span></p>"),
                                         $("<hr>").css("border-top", "1px dotted #8c8b8b"),
-                                        $("<p><b>Nombre Cliente:</b> <span>" + data[0].nombreComprador + "</span></p>"),
-                                        $("<p><b>Nombre Vendedor:</b> <span>" + data[0].vendedor.nombre + " " + data[0].vendedor.apellido + "</span></p>"),
-                                        $("<p><b>Fecha:</b> <span>" + new Date(data[0].fecha).toLocaleString() + "</span></p>"),
-                                        $("<p><b>Estado Pedido:</b> <span>" + data[0].estadoPedidoStr + "</span></p>"),
-                                        $("<p><b>N° Personas:</b> <span>" + data[0].nroPersonas + "</span></p>"),
-                                        $("<p><b>Observaciones:</b> <span>" + data[0].observaciones + "</span></p>"),
+                                        $("<div />").css("background-color", "rgba(191, 191, 191, 0.15)").css("padding","20px").append(
+                                            $("<p><b>Nombre Cliente:</b> <span>" + data[0].nombreComprador + "</span></p>"),
+                                            $("<p><b>Nombre Vendedor:</b> <span>" + data[0].vendedor.nombre + " " + data[0].vendedor.apellido + "</span></p>"),
+                                            $("<p><b>Fecha:</b> <span>" + new Date(data[0].fecha).toLocaleString() + "</span></p>"),
+                                            $("<p><b>Estado Pedido:</b> <span>" + data[0].estadoPedidoStr + "</span></p>"),
+                                            $("<p><b>N° Personas:</b> <span>" + data[0].nroPersonas + "</span></p>"),
+                                            $("<p><b>Observaciones:</b> <span>" + data[0].observaciones + "</span></p>"),
+                                       )
                                     );
                                 } else {
                                     return $("<div />").append(

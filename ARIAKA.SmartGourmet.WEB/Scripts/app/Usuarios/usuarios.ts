@@ -49,23 +49,23 @@ namespace Usuarios {
 
             let formData: any = $('#form-usuarios').dxForm('option').formData;
 
-            if (formData.Run === "") {
+            if (formData.Run === "" || formData.Run === null || formData.Run === undefined) {
                 DevExpress.ui.notify("No se puede crear usuario, falta RUT.", "error", 3000);
                 return;
             }
-            if (formData.Nombre === "") {
+            if (formData.Nombre === "" || formData.Nombre === null || formData.Nombre === undefined) {
                 DevExpress.ui.notify("No se puede crear usuario, falta nombre.", "error", 3000);
                 return;
             }
-            if (formData.Apellido === "") {
+            if (formData.Apellido === "" || formData.Apellido === null || formData.Apellido === undefined) {
                 DevExpress.ui.notify("No se puede crear usuario, falta apellido.", "error", 3000);
                 return;
             }
-            if (formData.Password === "") {
+            if (formData.Password === "" || formData.Password === null || formData.Password === undefined) {
                 DevExpress.ui.notify("No se puede crear usuario, falta contraseña.", "error", 3000);
                 return;
             }
-            if (formData.Rol === "") {
+            if (formData.Rol() === "" || formData.Rol() === null || formData.Rol() === undefined) {
                 DevExpress.ui.notify("No se puede crear usuario, falta el Rol.", "error", 3000);
                 return;
             }

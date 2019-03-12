@@ -8,8 +8,8 @@ Namespace Controllers.API
         Inherits ApiController
 
         <HttpGet>
-        <Route("{id}", Name:="GetPedidoByID")>
-        Public Function GetPedidoByID(id As Integer) As IHttpActionResult
+        <Route("{id}", Name:="GetPedidoByIDMesa")>
+        Public Function GetPedidoByIDMesa(id As Integer) As IHttpActionResult
 
             Dim db As New SGContext
             Try
@@ -28,6 +28,51 @@ Namespace Controllers.API
                     'Dim user As Usuario = listUsuarios.Where(Function(u) u.ID = Producto.Tipo_ID).SingleOrDefault
                     'Dim client As Cliente = listClientes.Where(Function(c) c.ID = Producto.Tipo_ID).SingleOrDefault
                     'Dim mesa As Mesa = listMesas.Where(Function(m) m.ID = Producto.Tipo_ID).SingleOrDefault
+                    listPedidoDto.Add(New Models.PedidoDTO With {.ID = pedido.ID,
+                                                                .Fecha = pedido.Fecha,
+                                                                .NroPersonas = pedido.NroPersonas,
+                                                                .EstadoPedido = pedido.EstadoPedido,
+                                                                .EstadoPedidoStr = pedido.EstadoPedido.ToString,
+                                                                .EsDomicilio = pedido.EsDomicilio,
+                                                                .Mesa = New Models.MesaDTO With {.ID = pedido.Mesa.ID,
+                                                                                                 .Capacidad = pedido.Mesa.Capacidad,
+                                                                                                 .Estado = pedido.Mesa.Estado,
+                                                                                                 .EstadoStr = pedido.Mesa.Estado.ToString,
+                                                                                                 .NumMesa = pedido.Mesa.NumMesa},
+                                                                .Vendedor = New Models.UsuarioDTO With {.ID = pedido.Vendedor.ID,
+                                                                                                        .Run = pedido.Vendedor.Run,
+                                                                                                        .Rol = pedido.Vendedor.Rol,
+                                                                                                        .RolStr = pedido.Vendedor.Rol.ToString,
+                                                                                                        .Nombre = pedido.Vendedor.Nombre,
+                                                                                                        .Apellido = pedido.Vendedor.Apellido,
+                                                                                                        .Password = pedido.Vendedor.Password},
+                                                                .NombreComprador = pedido.NombreComprador,
+                                                                .Observaciones = pedido.Observaciones
+                                      })
+                Next
+                Return Me.Ok(listPedidoDto)
+
+            Catch ex As Exception
+                Return Me.Content(HttpStatusCode.BadRequest, ex.Message)
+            Finally
+                db.Dispose()
+            End Try
+        End Function
+
+        <HttpGet>
+        <Route("modificar/{id}", Name:="GetPedidoByID")>
+        Public Function GetPedidoByID(id As Integer) As IHttpActionResult
+
+            Dim db As New SGContext
+            Try
+                Dim listPedido As List(Of Pedido) = Nothing
+                Dim listPedidoDto As New List(Of Models.PedidoDTO)
+
+                listPedido = db.Pedidos.Where(Function(p) p.ID = id).ToList()
+
+                If listPedido Is Nothing OrElse listPedido.Count = 0 Then Return Me.Ok(New List(Of Models.PedidoDTO))
+
+                For Each pedido As Pedido In listPedido
                     listPedidoDto.Add(New Models.PedidoDTO With {.ID = pedido.ID,
                                                                 .Fecha = pedido.Fecha,
                                                                 .NroPersonas = pedido.NroPersonas,
@@ -83,8 +128,10 @@ Namespace Controllers.API
                     End With
                     db.SaveChanges()
                     model.Vendedor = New Models.UsuarioDTO With {.ID = pedidoExist.Vendedor.ID, .Nombre = pedidoExist.Vendedor.Nombre, .Apellido = pedidoExist.Vendedor.Apellido}
-                    model.Comprador = New Models.ClienteDTO With {.ID = pedidoExist.Comprador.ID, .Nombre = pedidoExist.Comprador.Nombre, .Apellido = pedidoExist.Comprador.Apellido}
                     model.Mesa = New Models.MesaDTO With {.ID = pedidoExist.Mesa.ID, .NumMesa = pedidoExist.Mesa.NumMesa, .EstadoStr = pedidoExist.Mesa.Estado.ToString}
+                    If model.Comprador.ID <> -1 Then
+                        model.Comprador = New Models.ClienteDTO With {.ID = pedidoExist.Comprador.ID, .Nombre = pedidoExist.Comprador.Nombre, .Apellido = pedidoExist.Comprador.Apellido}
+                    End If
                     Return Me.Ok(model)
                 End If
 
