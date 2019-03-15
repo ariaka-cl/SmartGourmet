@@ -328,7 +328,7 @@ namespace Mesas {
                     //Estado Mesa debe concordar con pedidos
                     //Eliminar del form de creación de mesa la opción de seleccionar estado (todo estado mesa debe comenzar en disponible)
                     //Arreglar que las mesas no se puedan crear con un nombre ya existente.
-                    var employee = {},
+                    var mesa = {},
                         popup = null,
                         popupOptions = {
                             visible: false,

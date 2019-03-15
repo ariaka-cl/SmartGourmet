@@ -27,6 +27,8 @@ End Code
         </div>
     </div>
 
+    <div id="add-popup" data-bind="dxPopup: addProdPopup"></div>
+
 </div>
 
 @section scripts

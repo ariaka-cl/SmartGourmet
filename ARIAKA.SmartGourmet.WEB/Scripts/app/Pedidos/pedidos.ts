@@ -21,7 +21,8 @@ namespace Pedidos {
         public switchForm: KnockoutObservable<boolean> = ko.observable(false);
         public vendedor: KnockoutObservableArray<any> = ko.observableArray<any>();
         public pedidoExiste: KnockoutObservableArray<any> = ko.observableArray<any>();
-        public productosSelected: KnockoutObservableArray<any> = ko.observableArray<any>();
+        public prodSelec: KnockoutObservable<any> = ko.observable<any>();
+        public listProd: KnockoutObservableArray<any> = ko.observableArray<any>();
         public fechaPedido: KnockoutObservable<any> = ko.observable<any>(Date());
         public nombreVendedor: KnockoutObservable<any> = ko.observable<any>();
         public estPedido: KnockoutObservableArray<any> = ko.observableArray<any>();
@@ -186,6 +187,9 @@ namespace Pedidos {
                 formData.formData = pedidoData;
                 let form = $('#form-pedidos').dxForm('instance');
                 form.repaint();
+                var inst = $('#tabpanel-container').dxTabPanel('instance');
+                inst.option("items", this.categorias);
+                inst.repaint();
             })
         }
 
@@ -199,19 +203,26 @@ namespace Pedidos {
                 for (var i: number = 0; i < data.length; i++) {
                     let cate = {
                         id: data[i].id,
-                        nombre: data[i].nombre
+                        nombre: data[i].nombre,
+                        title: data[i].nombre
                     }
                     this.categorias.push(cate);
                     this.categoriasFilter.push(cate);
                 }
-                let inst = $('#tabpanel-container').dxTabPanel('instance');
-                var items = inst.option("items");
-                items.length = 0;
-                inst.option("items", items);
-                $(data).each(function () {
-                    var text = $(this).attr('nombre');
-                    items.push({ title: text, template: "<br/><br/>" + $(this).attr('nombre') + "<br/><br/>" });
-                })
+                //var inst = $('#tabpanel-container').dxTabPanel('instance');
+                //var items = inst.option("items");
+                //items.length = 0;
+                //inst.option("items", items);
+                //$(data).each(function () {
+                //    var text = $(this).attr('nombre');
+                //    items.push({ title: text, itemTitleTemplate: 'title', itemTemplate: 'item' });
+                //})
+                var inst = $('#tabpanel-container').dxTabPanel('instance');
+                var items = inst.option("items", this.categorias);
+                //for (var i: number = 0; i < data.length; i++) {
+                //    items.push({ title: data[i].nombre });
+                //}
+                //inst.option("items", this.categorias);
                 inst.repaint();
             }).fail((data: any) => {
                 DevExpress.ui.notify(data.responseJSON, "error", 3000);
@@ -620,56 +631,150 @@ namespace Pedidos {
                 colCount: 1,
                 items: [{
                     itemType: "group",
-                    colCount: 3,
+                    colCount: 5,
                     caption: "Datos del Pedido",
                     items: [{
-                            colSpan: 1,
-                            template: function (data, container) {
-                                //$("<div>").attr("id", "grid-productos").dxDataGrid({
-                                //    dataSource: this.productos,
-                                //    columns: [{ dataField: 'ID', visible: false },
-                                //    { dataField: 'Nombre', width: "35%" },
-                                //    { dataField: 'Tipo.nombre', caption: 'Categoría' },
-                                //    { dataField: 'StockActual', caption: 'Stock Actual', width: "9%" },
-                                //    { dataField: 'Precio', width: "8%" },
-                                //    { dataField: 'Descuento', width: "9%" }],
-                                //    editing: {
-                                //        allowUpdating: true,
-                                //        allowAdding: true,
-                                //        allowDeleting: true
-                                //    },
-                                //}).appendTo(container);
-                                $("<div>").attr("id", "simpleList").dxList({
-                                    dataSource: this.productosSelected,
-                                    height: "100%",
-                                    grouped: true,
-                                    collapsibleGroups: true,
-                                    groupTemplate: function (data) {
-                                        return $("<div>Assigned: " + data.key + "</div>");
-                                    }
+                            colSpan: 2,
+                            template: (data, container) => {
+                                $("<div>").attr("id", "grid-prod-select").dxDataGrid({
+                                    dataSource: this.listProd,
+                                    loadPanel: {
+                                        enabled: true,
+                                        text: 'Cargando datos...'
+                                    },
+                                    selection: {
+                                        mode: "single"
+                                    },
+                                    editing: {
+                                        allowDeleting: true,
+                                        allowUpdating: true,
+                                        texts: {
+                                            deleteRow: "Borrar",
+                                            editRow: "Editar"
+                                        },
+                                        mode: 'cell'
+                                    },
+                                    columnAutoWidth: true, 
+                                    columns: [{ dataField: 'ID', visible: false },
+                                    { dataField: 'Nombre', allowEditing: false, caption: 'Producto' },
+                                    { dataField: 'Cantidad' },
+                                    { dataField: 'Precio', allowEditing: false, caption: 'Precio U.', format: "currency" },
+                                    { dataField: 'PrecioT', allowEditing: false, caption: 'Precio T.', format: "currency" /*calculateDisplayValue: (rowData) => { return rowData.Precio * rowData.Cantidad }*/ }],
+                                    grouping: {
+                                        allowCollapsing: true
+                                    },
+                                    onRowUpdated: (e) => {
+                                        e.key.PrecioT = e.key.Precio * e.key.Cantidad;
+                                        var list = $("#grid-prod-select").dxDataGrid("instance");
+                                        list.refresh();
+                                    },
+                                    summary: {
+                                        totalItems: [{
+                                            column: "Nombre",
+                                            summaryType: "count"
+                                        }, {
+                                            column: "Precio T.",
+                                            summaryType: "sum",
+                                            valueFormat: "currency"
+                                            }],
+                                        texts: {
+                                            count: "Productos: {0}",
+                                            sum: "Total: {0}",
+                                        }
+                                    },
+                                    showBorders: false
+                                    , rowAlternationEnabled: false
+                                    , showRowLines: false
+                                    , showColumnLines: false
                                 }).appendTo(container);
                             }
                         }, {
-                            colSpan: 2,
-                            template: function (data, container) {
+                            colSpan: 3,
+                            template: (data, container) => {
                                 $("<div>").attr("id", "tabpanel-container").dxTabPanel({
-                                    height: 260,
-                                    dataSource: this.categorias,
+                                    height: "auto",
                                     selectedIndex: 0,
                                     loop: false,
+                                    deferRendering: true,
                                     animationEnabled: true,
                                     swipeEnabled: true,
+                                    onItemRendered: (e) => {
+                                        this.productos([]);
+                                        let url = 'api/productos/' + e.itemData.id;
+                                        $.ajax({
+                                            type: 'GET',
+                                            url: url,
+                                        }).done((data: any) => {
+                                            for (var i: number = 0; i < data.length; i++) {
+                                                this.productos.push({
+                                                    ID: data[i].id,
+                                                    Nombre: data[i].nombre,
+                                                    Precio: data[i].precio,
+                                                    Descuento: data[i].descuento,
+                                                    StockActual: data[i].stockActual,
+                                                    FechaCreacion: data[i].fechaCreacion,
+                                                    Tipo: data[i].tipo
+                                                });
+                                            }
+                                            $("<div>").attr("id", "grid-productos").css("margin-bottom", "-40px").dxDataGrid({
+                                                dataSource: this.productos,
+                                                loadPanel: {
+                                                    enabled: true,
+                                                    text: 'Cargando datos...'
+                                                },
+                                                selection: {
+                                                    mode: "single"
+                                                },
+                                                columnAutoWidth: true,
+                                                columns: [{ dataField: 'ID', visible: false },
+                                                { dataField: 'Nombre'},
+                                                { dataField: 'Tipo.nombre', caption: 'Categoría'},
+                                                { dataField: 'StockActual', caption: 'Stock Actual' },
+                                                { dataField: 'Precio'},
+                                                { dataField: 'Descuento'}],
+                                                grouping: {
+                                                    allowCollapsing: true
+                                                },
+                                                showBorders: true
+                                                , rowAlternationEnabled: true
+                                                , showRowLines: false
+                                                , showColumnLines: true,
+                                                //, filterRow: {
+                                                //    visible: true,
+                                                //    showOperationChooser: true,
+                                                //    applyFilter: "auto"
+                                                //},
+                                                searchPanel: {
+                                                    visible: true,
+                                                    width: 240,
+                                                    placeholder: "Buscar..."
+                                                },
+                                                onRowClick: (e) => {
+                                                    this.prodSelec(e.data);
+                                                    let popAddProd = $('#add-popup').dxPopup('instance');
+                                                    popAddProd.show();
+                                                }
+                                            }).prependTo(e.itemElement);
+                                            var tab = $("#tabpanel-container").dxTabPanel("instance");
+                                            this.productos([]);
+                                        }).fail((data: any) => {
+                                            DevExpress.ui.notify(data.responseJSON, "error", 3000);
+                                        });
+                          
+                                            
+                                            //var ginstdg = $("#grid-productos").dxDataGrid("instance");
+                                            //e.itemElement.append("<p>" + e.itemData.nombre + "</p>");
+                                            //e.component.option("itemTemplate", e.itemData.nombre);
+
+                                    },
                                     //itemTitleTemplate: function(itemData, itemIndex, itemElement) {
                                     //    itemElement.append("<p>" + itemData.nombre + "</p>");
                                     //},
                                     //itemTemplate: $("#customer"),
-                                    onSelectionChanged: function (e) {
-                                        $(".selected-index")
-                                            .text(e.component.option("selectedIndex") + 1);
-                                    },
-                                    onInitialized: (e) => {
-                                        let x = "pizza";
-                                    }
+                                    //onSelectionChanged: (e) => {
+                                    //    $(".selected-index")
+                                    //        .text(e.component.option("selectedIndex") + 1);
+                                    //}
                                 }).appendTo(container);
                             }
                         }]
@@ -686,7 +791,88 @@ namespace Pedidos {
                         }
                     }]
                 }]} 
-        ]};
+            ]
+        };
+
+        addProdPopup: any = {
+            visible: false,
+            width: "auto",
+            height: "auto",
+            position: {
+                my: 'center',
+                at: 'center',
+                of: window
+            },
+            dragEnabled: true,
+            closeOnOutsideClick: true,
+            contentTemplate: (contentElement) => {
+                return $("<div>").css('display', 'inline-flex').attr("id", "boton-menos").dxButton({
+                    text: "–",
+                    type: 'default',
+                    onClick: () => {
+                        let minus = $('#text-cantidad').dxNumberBox('instance');
+                        if (minus.option('value') > 0) {
+                            let value = minus.option('value') - 1;
+                            minus.option('value', value);
+                        }
+                    }
+                }).appendTo(contentElement),
+                $("<div>").css('display', 'inline-flex').attr("id", "text-cantidad").dxNumberBox({
+                    min: 0,
+                    width: 150
+                }).appendTo(contentElement),
+                $("<div>").css('display', 'inline-flex').attr("id", "boton-mas").dxButton({
+                    icon: "plus",
+                    type: 'default',
+                    onClick: () => {
+                        let add = $('#text-cantidad').dxNumberBox('instance');
+                        let value = add.option('value') + 1;
+                        add.option('value', value);
+                    }
+                }).appendTo(contentElement)
+            },
+            onShowing: (e) => {
+                let add = $('#text-cantidad').dxNumberBox('instance');
+                add.option('value', 0);
+            },
+            toolbarItems: [{
+                toolbar: 'top',
+                text: "Seleccione cantidad",
+                location: "center"
+            }, {
+                widget: "dxButton",
+                toolbar: 'bottom',
+                location: "after",
+                options: {
+                    text: "Añadir",
+                    icon: "plus",
+                    type: 'success',
+                    onClick: () => {
+                        let add = $('#text-cantidad').dxNumberBox('instance');
+                        let value = add.option('value');
+                        let prodData: any = {
+                            ID: this.prodSelec().ID,
+                            Descuento: this.prodSelec().Descuento,
+                            FechaCreacion: this.prodSelec().FechaCreacion,
+                            Nombre: this.prodSelec().Nombre,
+                            Precio: this.prodSelec().Precio,
+                            StockActual: this.prodSelec().StockActual,
+                            Tipo: this.prodSelec().Tipo,
+                            Cantidad: value,
+                            PrecioT: this.prodSelec().Precio * value
+                        }
+                        this.listProd.push(prodData);
+                        //var x = this.listProd();
+                        //var y = this.prodSelec();
+                        this.prodSelec([]);
+                        var list = $("#grid-prod-select").dxDataGrid("instance");
+                        list.refresh();
+                        let popAddProd = $('#add-popup').dxPopup('instance');
+                        popAddProd.hide();
+                    }
+                }
+            }]
+        }
 
         cleanButton: any = {
             text: "Limpiar",
@@ -718,6 +904,7 @@ namespace Pedidos {
             type: 'success',
             onClick: (e) => {
                 this.addPedidos();
+                //this.addDetallePedido();
                 this.enable(true);
             }
         }
