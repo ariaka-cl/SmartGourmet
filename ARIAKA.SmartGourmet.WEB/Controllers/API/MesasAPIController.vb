@@ -55,6 +55,10 @@ Namespace Controllers.API
                     Return Me.Ok(model)
                 End If
 
+                If db.Mesas.Where(Function(m) m.NumMesa = model.NumMesa).Any Then
+                    Return Me.Content(HttpStatusCode.BadRequest, "Ya existe este nombre de mesa.")
+                End If
+
                 Dim mesa As New Mesa With {.NumMesa = model.NumMesa, .Capacidad = model.Capacidad, .Estado = model.Estado}
                 db.Mesas.Add(mesa)
                 db.SaveChanges()

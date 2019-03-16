@@ -10,6 +10,7 @@ namespace Mesas {
         public mesaSeleccionada: KnockoutObservable<any> = ko.observable<any>();
         public pedidoMesa: KnockoutObservable<any> = ko.observable<any>();
         public idMesa: KnockoutObservable<any> = ko.observable<any>();
+        public startMesa: KnockoutObservable<any> = ko.observable<any>(1);
         public enable: KnockoutObservable<boolean> = ko.observable(true);
         public disableMod: KnockoutObservable<boolean> = ko.observable(true);
         public disableCreate: KnockoutObservable<boolean> = ko.observable(true);
@@ -72,11 +73,6 @@ namespace Mesas {
                 return;
             }
 
-            if (formData.Estado === "" || formData.Capacidad === null || formData.Capacidad === undefined) {
-                DevExpress.ui.notify("No se puede crear estado, falta estado", "error", 3000);
-                return;
-            }
-
             let url = 'api/mesas';
             $.ajax({
                 type: 'POST',
@@ -85,7 +81,7 @@ namespace Mesas {
                     ID: formData.ID,
                     NumMesa: formData.NumMesa,
                     Capacidad: formData.Capacidad,
-                    Estado: formData.Estado,
+                    Estado: 1,
                  }
             }).done((data: any) => {
                 DevExpress.ui.notify("Datos guardados correctamente.", "success", 2000);
@@ -132,6 +128,7 @@ namespace Mesas {
             });
             window.localStorage.removeItem('idmesa');
             window.localStorage.removeItem('idpedido');
+            window.localStorage.removeItem('nummesa');
         }
 
         formOptions: any = {
@@ -148,7 +145,7 @@ namespace Mesas {
                     }
                 }, {
                     itemType: "group",
-                    colCount: 3,
+                    colCount: 1,
                     items: [{
                         dataField: "Capacidad",
                         editorType: "dxNumberBox",
@@ -156,16 +153,6 @@ namespace Mesas {
                         editorOptions: {
                             showSpinButtons: true,
                             min: 0
-                        }
-                    }, {
-                        dataField: "Estado",
-                        editorType: "dxSelectBox",
-                        colSpan: 2,
-                        editorOptions: {
-                            dataSource: this.tipoEstados,
-                            placeholder: "Seleccionar...",
-                            displayExpr: 'Nombre',
-                            valueExpr: 'Clave'
                         }
                     }]
                 }]
@@ -221,6 +208,7 @@ namespace Mesas {
                         dataField: "Estado",
                         editorType: "dxSelectBox",
                         colSpan: 2,
+                        disabled: true,
                         editorOptions: {
                             dataSource: this.tipoEstados,
                             placeholder: "Seleccionar...",
@@ -273,24 +261,6 @@ namespace Mesas {
                     + "<img src='" + encodeURI(url) + "' width='183' height='80' class='img- thumbnail'/>");
              },
             onItemClick: (e) => {
-                //this.enable(false);
-                //$.getJSON('api/pedidos/' + e.itemData.ID).then((result: any): void => {
-                //    for (var i: number = 0; i < result.length; i++) {
-                //        this.pedidoMesa.push({
-                //            Comprador: result[i].comprador,
-                //            EsDomicilio: result[i].esDomicilio,
-                //            EstadoPedido: result[i].estadoPedido,
-                //            Fecha: result[i].fecha,
-                //            ID: result[i].id,
-                //            Mesa: result[i].mesa,
-                //            NombreComprador: result[i].nombreComprador,
-                //            NroPersonas: result[i].nroPersonas,
-                //            Observaciones: result[i].observaciones,
-                //            Vendedor: result[i].vendedor,
-                //        });
-                //    }
-
-                //});
                 this.disableMod(true);
                 this.disableCreate(true);
                 this.pedidoMesa([]);
@@ -299,17 +269,9 @@ namespace Mesas {
                     type: 'GET',
                     url: url,
                 }).done((data: any) => {
-                    //this.pedidoMesa({
-                    //    EsDomicilio: data[0].esDomicilio,
-                    //    EstadoPedido: data[0].estadoPedido,
-                    //    Fecha: data[0].fecha,
-                    //    ID: data[0].id,
-                    //    Mesa: data[0].mesa,
-                    //    NombreComprador: data[0].nombreComprador,
-                    //    NroPersonas: data[0].nroPersonas,
-                    //    Observaciones: data[0].observaciones,
-                    //    Vendedor: data[0].vendedor,
-                    //});
+                    if (e.itemData.NumMesa == 'Domicilio') {
+                        data[0] = undefined;
+                    }
 
                     if (data[0] !== undefined) {
                         this.disableMod(false);
@@ -325,9 +287,6 @@ namespace Mesas {
                         EstadoStr: e.itemData.EstadoStr
                     }
                     this.mesaSeleccionada(mesaData);
-                    //Estado Mesa debe concordar con pedidos
-                    //Eliminar del form de creación de mesa la opción de seleccionar estado (todo estado mesa debe comenzar en disponible)
-                    //Arreglar que las mesas no se puedan crear con un nombre ya existente.
                     var mesa = {},
                         popup = null,
                         popupOptions = {
@@ -383,6 +342,7 @@ namespace Mesas {
                                     type: 'success',
                                     onClick: () => {
                                         window.localStorage.setItem('idmesa', e.itemData.ID);
+                                        window.localStorage.setItem('nummesa', e.itemData.NumMesa);
                                         window.location.replace(window.location.origin + '/Pedidos');
                                     }
                                 }
@@ -412,13 +372,6 @@ namespace Mesas {
                         .appendTo($("#form-info-popup"));
                     popup = $popupContainer.dxPopup(popupOptions).dxPopup("instance");
                     popup.show();
-                //let formData: any = $('#form-mesas').dxForm('option');
-                //formData.formData = mesaData;
-                //this.idRow(mesaData.ID);
-                //this.idRowIndex(e.rowIndex);
-                //let form = $('#form-mesas').dxForm('instance');
-                //form.repaint();
-
                 }).fail((data: any) => {
                     DevExpress.ui.notify(data.responseJSON, "error", 3000);
                 });

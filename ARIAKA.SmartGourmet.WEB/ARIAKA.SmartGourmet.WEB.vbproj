@@ -207,6 +207,7 @@
     </Compile>
     <Compile Include="Models\CategoriasDTO.vb" />
     <Compile Include="Models\ClienteDTO.vb" />
+    <Compile Include="Models\DetallePedidoDTO.vb" />
     <Compile Include="Models\EstadoPedidoDTO.vb" />
     <Compile Include="Models\PedidoDTO.vb" />
     <Compile Include="Models\ProductoDTO.vb" />

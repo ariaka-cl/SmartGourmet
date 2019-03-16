@@ -203,11 +203,7 @@ namespace Productos {
                         dataSource: this.categorias,
                         placeholder: "Seleccione una categoría...",
                         displayExpr: 'nombre',
-                        valueExpr: 'id',
-                        onItemClick: (e) => {
-                            let car = "gola";
-                            let c2ar = "gola";
-                        }
+                        valueExpr: 'id'
                     }
                 }]
             }]

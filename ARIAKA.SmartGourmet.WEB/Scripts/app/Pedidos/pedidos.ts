@@ -1,10 +1,7 @@
 ﻿/// <reference path="../../typings/devextreme/devextreme.d.ts" />
 /// <reference path="../../typings/jquery/jquery.d.ts" />
 /// <reference path="../../typings/knockout/knockout.d.ts" />
-//  --- FALTA QUE SE MANTENGA LA ID AL GUARDAR UN CLIENTE NUEVO, PARA LUEGO MODIFICAR EL MISMO
-//  --- Y FALTA QUE TELEFONO SEA AUTOCOMPLETE, CON REPAINT DEL FORM Y SUS DATOS.
-//  --- AGREGAR VALIDACION CUADRITO ROJO APELLIDO
-// preguntar: Si se selecciona un nombre, se carga su ID, sus datos, etc. Al borrar el nombre completo,reseteo el ID CLIENTe? o Mantengo el ID para modificar ese cliente. OPCION ( CREAR BOTON LIMPIAR CLIENTE )
+
 namespace Pedidos {
     'use strict'
     export class PedidosIndexViewModel {
@@ -12,6 +9,7 @@ namespace Pedidos {
         public clientes: KnockoutObservableArray<any> = ko.observableArray<any>();
         public datosFormCliente: KnockoutObservable<any> = ko.observable<any>();
         public idCliente: KnockoutObservable<number> = ko.observable(0);
+        public idPedido: KnockoutObservable<number> = ko.observable(0);
         public clienteExiste: KnockoutObservable<boolean> = ko.observable(false);
         public clienteModificado: KnockoutObservable<boolean> = ko.observable(false);
         public disableForm: KnockoutObservable<boolean> = ko.observable(true);
@@ -156,33 +154,31 @@ namespace Pedidos {
                 type: 'GET',
                 url: url,
             }).done((data: any) => {
-                //for (var i: number = 0; i < data.length; i++) {
-                //    this.pedidoExiste.push({
-                //        ID: data[i].id,
-                //        Fecha: data[i].fecha,
-                //        NroPersonas: data[i].nroPersonas,
-                //        EstadoPedido: data[i].estadoPedido,
-                //        EstadoPedidoStr: data[i].estadoPedidoStr,
-                //        EsDomicilio: data[i].esDomicilio,
-                //        Mesa: data[i].mesa,
-                //        Vendedor: data[i].vendedor,
-                //        NombreComprador: data[i].nombreComprador,
-                //        Observaciones: data[i].observaciones
-                //    });
-                //}
                 let formData: any = $('#form-pedidos').dxForm('option');
+                if (data[0].comprador == null) {
+                    data[0].comprador = { 'id': 0 }
+                }
+
                 let pedidoData: any = {
                     ID: data[0].id,
                     Fecha: data[0].fecha,
+                    EsDomicilio: data[0].esDomicilio,
                     NroPersonas: data[0].nroPersonas,
                     EstadoPedido: data[0].estadoPedido,
                     EstadoPedidoStr: data[0].estadoPedidoStr,
                     Mesa: data[0].mesa,
+                    CompradorID: data[0].comprador.id,
+                    Telefono: data[0].comprador.telefono,
+                    Direccion: data[0].comprador.direccion,
                     Vendedor: data[0].vendedor.id,
                     Nombre: data[0].nombreComprador,
                     Observaciones: data[0].observaciones
                 }
                 this.nombreVendedor(data[0].vendedor.id);
+                this.switchForm(pedidoData.EsDomicilio);
+                this.clienteExiste(pedidoData.EsDomicilio);
+                this.disableForm(!pedidoData.EsDomicilio);
+                this.idCliente(pedidoData.CompradorID);
                 this.fechaPedido(data[0].fecha);
                 formData.formData = pedidoData;
                 let form = $('#form-pedidos').dxForm('instance');
@@ -190,6 +186,28 @@ namespace Pedidos {
                 var inst = $('#tabpanel-container').dxTabPanel('instance');
                 inst.option("items", this.categorias);
                 inst.repaint();
+            })
+        }
+
+        getDetallePedido(id: any): void {
+            this.listProd([]);
+            let url = 'api/pedidos/detalle/' + id;
+            $.ajax({
+                type: 'GET',
+                url: url,
+            }).done((data: any) => {
+                for (var i: number = 0; i < data.length; i++) {
+                    this.listProd.push({
+                        ID: data[i].id,
+                        ProductoID: data[i].productoID,
+                        Nombre: data[i].nombre,
+                        Precio: data[i].precio,
+                        Cantidad: data[i].cantidad,
+                        PrecioT: data[i].precio * data[i].cantidad
+                    });
+                }
+                var list = $("#grid-prod-select").dxDataGrid("instance");
+                list.refresh();
             })
         }
 
@@ -209,20 +227,8 @@ namespace Pedidos {
                     this.categorias.push(cate);
                     this.categoriasFilter.push(cate);
                 }
-                //var inst = $('#tabpanel-container').dxTabPanel('instance');
-                //var items = inst.option("items");
-                //items.length = 0;
-                //inst.option("items", items);
-                //$(data).each(function () {
-                //    var text = $(this).attr('nombre');
-                //    items.push({ title: text, itemTitleTemplate: 'title', itemTemplate: 'item' });
-                //})
                 var inst = $('#tabpanel-container').dxTabPanel('instance');
                 var items = inst.option("items", this.categorias);
-                //for (var i: number = 0; i < data.length; i++) {
-                //    items.push({ title: data[i].nombre });
-                //}
-                //inst.option("items", this.categorias);
                 inst.repaint();
             }).fail((data: any) => {
                 DevExpress.ui.notify(data.responseJSON, "error", 3000);
@@ -252,6 +258,11 @@ namespace Pedidos {
 
             let formData: any = $('#form-pedidos').dxForm('option').formData;
 
+            if (this.listProd().length == 0) {
+                DevExpress.ui.notify("No se puede crear pedido, falta agregar productos.", "error", 3000);
+                return;
+            }
+
             if (formData.Fecha instanceof Function) {
                 formData.Fecha = formData.Fecha();
             }
@@ -272,10 +283,6 @@ namespace Pedidos {
                 DevExpress.ui.notify("No se puede crear pedido, falta vendedor.", "error", 3000);
                 return;
             }
-            //if (formData.EstadoPedido === "" || formData.EstadoPedido === null || formData.EstadoPedido === undefined) {
-            //    DevExpress.ui.notify("No se puede crear pedido, falta el estado del pedido.", "error", 3000);
-            //    return;
-            //}
 
             formData.Fecha = new Date(formData.Fecha).toISOString();
 
@@ -298,12 +305,8 @@ namespace Pedidos {
             if (this.switchForm() == false) {
                 var compradorNull = { 'id': -1 }
                 this.datosFormCliente(compradorNull);
-                //let idmesa = { 'id': window.localStorage.getItem('idmesa') };
             }
             let idmesa = { 'id': window.localStorage.getItem('idmesa') };
-            //if (this.switchForm() == true) {
-            //    var idmesa = { 'id': -1 };
-            //}
 
             let url = 'api/pedidos';
             $.ajax({
@@ -322,20 +325,33 @@ namespace Pedidos {
                     EsDomicilio: formData.EsDomicilio
                 }
             }).done((data: any) => {
+                this.idPedido(data.id);
+                this.addDetallePedido();
+            }).fail((data: any) => {
+                DevExpress.ui.notify(data.responseJSON, "error", 3000);
+            });
+        }
+
+        addDetallePedido(): void {
+            var info = JSON.stringify(this.listProd());
+            let url = 'api/pedidos/detalleModificar';
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: { listDetallePedidoDTO: this.listProd(), id: this.idPedido() }
+            }).done((data: any) => {
                 DevExpress.ui.notify("Pedido guardado satisfactoriamente.", "success", 2000);
                 $('#form-pedidos').dxForm('instance').resetValues();
                 window.localStorage.removeItem('idmesa');
                 window.localStorage.removeItem('idpedido');
+                window.localStorage.removeItem('nummesa');
                 this.datosFormCliente([]);
+                this.listProd([]);
                 this.clienteExiste(false);
                 this.clienteModificado(false);
                 this.switchForm(false);
-                this.getProductos(this.prodByCat());
-                let grid = $('#grid-productos').dxDataGrid('instance');
                 this.limpiarForm();
                 this.enable(true);
-                grid.refresh();
-                grid.repaint();
                 setTimeout(function () { window.location.replace(window.location.origin + '/Mesas') }, 1000);
             }).fail((data: any) => {
                 DevExpress.ui.notify(data.responseJSON, "error", 3000);
@@ -343,7 +359,6 @@ namespace Pedidos {
         }
 
         constructor() {
-            //this.getProductos(this.prodByCat());
             this.getClientes();
             this.getVendedores();
             this.getCategorias();
@@ -358,6 +373,7 @@ namespace Pedidos {
             });
             if (window.localStorage.getItem("idpedido") !== null) {
                 this.getPedidoByID(window.localStorage.getItem("idpedido"));
+                this.getDetallePedido(window.localStorage.getItem("idpedido"));
             }
         }
 
@@ -463,17 +479,7 @@ namespace Pedidos {
                     itemType: "group",
                     colCount: 1,
                     caption: "Información de Pedido",
-                    items: [/*{
-                        dataField: "EstadoPedido",
-                        editorType: "dxSelectBox",
-                        editorOptions: {
-                            dataSource: this.estPedido,
-                            placeholder: "Seleccione estado pedido...",
-                            displayExpr: 'Nombre',
-                            valueExpr: 'Clave',
-                            value: this.nombreEstPedido
-                        }
-                    }, */{
+                    items: [{
                         dataField: "Vendedor",
                         editorType: "dxSelectBox",
                         editorOptions: {
@@ -510,6 +516,8 @@ namespace Pedidos {
                         editorOptions: {
                             switchedOnText: 'SI',
                             switchedOffText: 'NO',
+                            name: "switch",
+                            disabled: true,
                             value: this.switchForm,
                             onValueChanged: (e: any) => {
                                 if (e.value == true) {
@@ -657,9 +665,9 @@ namespace Pedidos {
                                     columnAutoWidth: true, 
                                     columns: [{ dataField: 'ID', visible: false },
                                     { dataField: 'Nombre', allowEditing: false, caption: 'Producto' },
-                                    { dataField: 'Cantidad' },
-                                    { dataField: 'Precio', allowEditing: false, caption: 'Precio U.', format: "currency" },
-                                    { dataField: 'PrecioT', allowEditing: false, caption: 'Precio T.', format: "currency" /*calculateDisplayValue: (rowData) => { return rowData.Precio * rowData.Cantidad }*/ }],
+                                    { dataField: 'Cantidad', width: "70px" },
+                                    { dataField: 'Precio', allowEditing: false, width: "70px", caption: 'Precio U.', format: "currency" },
+                                    { dataField: 'PrecioT', allowEditing: false, caption: 'Precio T.', format: "currency" }],
                                     grouping: {
                                         allowCollapsing: true
                                     },
@@ -729,26 +737,32 @@ namespace Pedidos {
                                                 columns: [{ dataField: 'ID', visible: false },
                                                 { dataField: 'Nombre'},
                                                 { dataField: 'Tipo.nombre', caption: 'Categoría'},
-                                                { dataField: 'StockActual', caption: 'Stock Actual' },
-                                                { dataField: 'Precio'},
-                                                { dataField: 'Descuento'}],
+                                                { dataField: 'StockActual', width: '91px', caption: 'Stock Actual' },
+                                                { dataField: 'Precio', width: '65px', format: "currency"},
+                                                { dataField: 'Descuento', caption: 'Desc.', width: '50px'}],
                                                 grouping: {
                                                     allowCollapsing: true
+                                                },
+                                                onInitialized: (e) => {
+                                                    if (window.localStorage.getItem("nummesa") == "Domicilio" && this.switchForm() == false) {
+                                                        let form = $('#form-pedidos').dxForm('instance');
+                                                        let sw: any = form.getEditor('EsDomicilio');
+                                                        sw.option('value', true);
+                                                        var inst = $('#tabpanel-container').dxTabPanel('instance');
+                                                        var items = inst.option("items", this.categorias);
+                                                        inst.repaint();
+                                                    }
                                                 },
                                                 showBorders: true
                                                 , rowAlternationEnabled: true
                                                 , showRowLines: false
                                                 , showColumnLines: true,
-                                                //, filterRow: {
-                                                //    visible: true,
-                                                //    showOperationChooser: true,
-                                                //    applyFilter: "auto"
-                                                //},
                                                 searchPanel: {
                                                     visible: true,
                                                     width: 240,
                                                     placeholder: "Buscar..."
                                                 },
+                                                
                                                 onRowClick: (e) => {
                                                     this.prodSelec(e.data);
                                                     let popAddProd = $('#add-popup').dxPopup('instance');
@@ -760,21 +774,7 @@ namespace Pedidos {
                                         }).fail((data: any) => {
                                             DevExpress.ui.notify(data.responseJSON, "error", 3000);
                                         });
-                          
-                                            
-                                            //var ginstdg = $("#grid-productos").dxDataGrid("instance");
-                                            //e.itemElement.append("<p>" + e.itemData.nombre + "</p>");
-                                            //e.component.option("itemTemplate", e.itemData.nombre);
-
                                     },
-                                    //itemTitleTemplate: function(itemData, itemIndex, itemElement) {
-                                    //    itemElement.append("<p>" + itemData.nombre + "</p>");
-                                    //},
-                                    //itemTemplate: $("#customer"),
-                                    //onSelectionChanged: (e) => {
-                                    //    $(".selected-index")
-                                    //        .text(e.component.option("selectedIndex") + 1);
-                                    //}
                                 }).appendTo(container);
                             }
                         }]
@@ -819,7 +819,14 @@ namespace Pedidos {
                 }).appendTo(contentElement),
                 $("<div>").css('display', 'inline-flex').attr("id", "text-cantidad").dxNumberBox({
                     min: 0,
-                    width: 150
+                    width: 150,
+                    onValueChanged: (e) => {
+                        if (e.value == 0) {
+                            this.enable(true);
+                        } else {
+                            this.enable(false);
+                        }
+                    }
                 }).appendTo(contentElement),
                 $("<div>").css('display', 'inline-flex').attr("id", "boton-mas").dxButton({
                     icon: "plus",
@@ -847,23 +854,19 @@ namespace Pedidos {
                     text: "Añadir",
                     icon: "plus",
                     type: 'success',
+                    disabled: this.enable,
                     onClick: () => {
                         let add = $('#text-cantidad').dxNumberBox('instance');
                         let value = add.option('value');
                         let prodData: any = {
-                            ID: this.prodSelec().ID,
-                            Descuento: this.prodSelec().Descuento,
-                            FechaCreacion: this.prodSelec().FechaCreacion,
+                            ID: 0,
+                            ProductoID: this.prodSelec().ID,
                             Nombre: this.prodSelec().Nombre,
                             Precio: this.prodSelec().Precio,
-                            StockActual: this.prodSelec().StockActual,
-                            Tipo: this.prodSelec().Tipo,
                             Cantidad: value,
                             PrecioT: this.prodSelec().Precio * value
                         }
                         this.listProd.push(prodData);
-                        //var x = this.listProd();
-                        //var y = this.prodSelec();
                         this.prodSelec([]);
                         var list = $("#grid-prod-select").dxDataGrid("instance");
                         list.refresh();
@@ -904,7 +907,6 @@ namespace Pedidos {
             type: 'success',
             onClick: (e) => {
                 this.addPedidos();
-                //this.addDetallePedido();
                 this.enable(true);
             }
         }
