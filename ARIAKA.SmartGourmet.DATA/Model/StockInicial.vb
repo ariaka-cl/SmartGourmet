@@ -3,6 +3,6 @@
         Public Property ID As Integer
         Public Property Stock As Integer
         Public Property FechaActualizacion As Date
-        Public Property Producto As Producto
+        Public Overridable Property Producto As Producto
     End Class
 End Namespace

@@ -4,6 +4,6 @@
         Public Property Cantidad As Integer
         Public Property Detalle As String
         Public Property Observacion As TipoObservacion
-        Public Property Producto As Producto
+        Public Overridable Property Producto As Producto
     End Class
 End Namespace

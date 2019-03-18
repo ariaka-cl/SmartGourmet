@@ -6,14 +6,14 @@ Imports System.Resources
 
 Namespace Migrations
     <GeneratedCode("EntityFramework.Migrations", "6.2.0-61023")>
-    Public NotInheritable Partial Class FuncionProd
+    Public NotInheritable Partial Class SP_GetProdSinFoto
         Implements IMigrationMetadata
     
-        Private ReadOnly Resources As New ResourceManager(GetType(FuncionProd))
+        Private ReadOnly Resources As New ResourceManager(GetType(SP_GetProdSinFoto))
         
         Private ReadOnly Property IMigrationMetadata_Id() As String Implements IMigrationMetadata.Id
             Get
-                Return "201903050317126_FuncionProd"
+                Return "201903072153367_SP_GetProdSinFoto"
             End Get
         End Property
         

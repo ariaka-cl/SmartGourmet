@@ -17,7 +17,7 @@ End Code
         </div>
     </div>
 
-    <div class="dx-field">
+    <div class="dx-field" style="margin-top: 30px; margin-bottom: 30px;">
         <div id="form-pedidos" data-bind="dxForm: formOptions"></div>
     </div>
 
@@ -26,6 +26,8 @@ End Code
             <div id="botonCreate" data-bind="dxButton: createButton"></div>
         </div>
     </div>
+
+    <div id="add-popup" data-bind="dxPopup: addProdPopup"></div>
 
 </div>
 
