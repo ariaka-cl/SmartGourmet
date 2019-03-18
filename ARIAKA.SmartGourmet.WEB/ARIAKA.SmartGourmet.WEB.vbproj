@@ -190,6 +190,8 @@
     <Compile Include="App_Start\FilterConfig.vb" />
     <Compile Include="App_Start\RouteConfig.vb" />
     <Compile Include="App_Start\WebApiConfig.vb" />
+    <Compile Include="Controllers\AdminCajaController.vb" />
+    <Compile Include="Controllers\API\AdminCajaAPIController.vb" />
     <Compile Include="Controllers\API\ClientesApiController.vb" />
     <Compile Include="Controllers\API\PedidosAPIController.vb" />
     <Compile Include="Controllers\API\ProductosAPIController.vb" />
@@ -205,11 +207,13 @@
     <Compile Include="Global.asax.vb">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\AdminCajaDTO.vb" />
     <Compile Include="Models\CategoriasDTO.vb" />
     <Compile Include="Models\ClienteDTO.vb" />
     <Compile Include="Models\PedidoDTO.vb" />
     <Compile Include="Models\ProductoDTO.vb" />
     <Compile Include="Models\RolDTO.vb" />
+    <Compile Include="Models\TurnoDTO.vb" />
     <Compile Include="Models\UsuarioDTO.vb" />
     <Compile Include="Models\EstadoDTO.vb" />
     <Compile Include="Models\MesaDTO.vb" />
@@ -316,6 +320,7 @@
     <Content Include="Content\fonts\Roboto-300.woff2" />
     <Content Include="Content\fonts\Roboto-300.woff" />
     <Content Include="Content\fonts\Roboto-300.ttf" />
+    <Content Include="Controllers\API\ProductosAPIController.vb.orig" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
@@ -362,6 +367,7 @@
     <Content Include="Views\Mesas\Index.vbhtml" />
     <Content Include="Views\Productos\Index.vbhtml" />
     <Content Include="Views\Pedidos\Index.vbhtml" />
+    <Content Include="Views\AdminCaja\Index.vbhtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="favicon.ico" />
@@ -411,6 +417,7 @@
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="Scripts\app\AdminCaja\admincaja.ts" />
     <TypeScriptCompile Include="Scripts\app\Categorias\categorias.ts" />
     <TypeScriptCompile Include="Scripts\app\Clientes\clientes.ts" />
     <TypeScriptCompile Include="Scripts\app\Pedidos\pedidos.ts" />

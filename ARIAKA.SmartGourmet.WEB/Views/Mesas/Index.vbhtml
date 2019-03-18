@@ -13,7 +13,7 @@ End Code
     </div>
 
     <div class="dx-field">
-        <div id="botonesDetalle" class="btn-group" role="group" style="float:left;">
+        <div id="botonesDetalle" class="btn-group" role="group" style="float:right;">
             <div id="botonOpt" data-bind="dxButton: modifPopup"></div>
             <div id="botonOpt" data-bind="dxButton: buttonOptionsDelete"></div>
             <div id="botonCrear" data-bind="dxButton: addPopup"></div>
