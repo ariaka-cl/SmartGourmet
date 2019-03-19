@@ -16,18 +16,12 @@ Namespace Controllers.API
                 Dim listPedido As List(Of Pedido) = Nothing
                 Dim listPedidoDto As New List(Of Models.PedidoDTO)
 
-                listPedido = db.Pedidos.Where(Function(p) p.Mesa.ID = id And (p.EstadoPedido = 0 Or p.EstadoPedido = 1)).ToList()
+                listPedido = db.Pedidos.Where(Function(p) p.Mesa.ID = id And (p.EstadoPedido = EstadoPedido.Preparacion Or p.EstadoPedido = EstadoPedido.Listo)).ToList()
 
                 If listPedido Is Nothing OrElse listPedido.Count = 0 Then Return Me.Ok(New List(Of Models.PedidoDTO))
 
-                'Dim listUsuarios As List(Of Usuario) = db.Usuarios.ToList()
-                'Dim listClientes As List(Of Cliente) = db.Clientes.ToList()
-                'Dim listMesas As List(Of Mesa) = db.Mesas.ToList()
 
                 For Each pedido As Pedido In listPedido
-                    'Dim user As Usuario = listUsuarios.Where(Function(u) u.ID = Producto.Tipo_ID).SingleOrDefault
-                    'Dim client As Cliente = listClientes.Where(Function(c) c.ID = Producto.Tipo_ID).SingleOrDefault
-                    'Dim mesa As Mesa = listMesas.Where(Function(m) m.ID = Producto.Tipo_ID).SingleOrDefault
                     listPedidoDto.Add(New Models.PedidoDTO With {.ID = pedido.ID,
                                                                 .Fecha = pedido.Fecha,
                                                                 .NroPersonas = pedido.NroPersonas,
@@ -164,10 +158,6 @@ Namespace Controllers.API
                     Return Me.Ok(model)
                 End If
 
-                'If db.Pedidos.Where(Function(p) p.Nombre = model.Nombre).Any Then
-                '    Return Me.Content(HttpStatusCode.BadRequest, "Este pedido ya existe.")
-                'End If
-
                 Dim pedido As New Pedido With {.Fecha = DateTime.Parse(model.Fecha),
                                                 .Vendedor = db.Usuarios.Where(Function(u) u.ID = model.VendedorID).SingleOrDefault(),
                                                 .Comprador = db.Clientes.Where(Function(c) c.ID = model.Comprador.ID).SingleOrDefault(),
@@ -226,13 +216,11 @@ Namespace Controllers.API
 
                 If listDetallePedido Is Nothing OrElse listDetallePedido.Count = 0 Then Return Me.Ok(New List(Of Models.DetallePedidoDTO))
 
-                'Dim listProductos As List(Of ProductoResultSet) = db.GetProdSinFoto.ToList()
-
                 For Each detallepedido As DetallePedido In listDetallePedido
-                    'Dim prod As ProductoResultSet = listProductos.Where(Function(c) c.ID = detallepedido.Producto.ID).SingleOrDefault
+
                     listDetallePedidoDto.Add(New Models.DetallePedidoDTO With {.ID = detallepedido.ID,
                                                                 .Cantidad = detallepedido.Cantidad,
-                                                                .ProductoID = detallepedido.Producto.ID, 'New Models.ProductoDTO With {.ID = prod.ID, .Nombre = prod.Nombre, .Descuento = prod.Descuento, .FechaCreacion = prod.FechaCreacion, .Precio = prod.Precio, .StockActual = prod.StockActual, .TipoID = prod.Tipo_ID},
+                                                                .ProductoID = detallepedido.Producto.ID,
                                                                 .Nombre = detallepedido.Producto.Nombre,
                                                                 .Precio = detallepedido.Producto.Precio
                                       })
