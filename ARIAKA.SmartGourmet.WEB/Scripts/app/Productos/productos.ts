@@ -84,7 +84,7 @@ namespace Productos {
                 DevExpress.ui.notify("No se puede crear producto, falta stock.", "error", 3000);
                 return;
             }
-            if (formData.Tipo === "") {
+            if (formData.Tipo === "" || formData.Tipo === null || formData.Tipo === undefined) {
                 DevExpress.ui.notify("No se puede crear producto, falta la categoría.", "error", 3000);
                 return;
             }

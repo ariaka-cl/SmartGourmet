@@ -191,9 +191,11 @@
     <Compile Include="App_Start\RouteConfig.vb" />
     <Compile Include="App_Start\WebApiConfig.vb" />
     <Compile Include="Controllers\API\ClientesApiController.vb" />
+    <Compile Include="Controllers\API\PedidosAPIController.vb" />
     <Compile Include="Controllers\API\ProductosAPIController.vb" />
     <Compile Include="Controllers\API\UsuariosAPIController.vb" />
     <Compile Include="Controllers\ClientesController.vb" />
+    <Compile Include="Controllers\PedidosController.vb" />
     <Compile Include="Controllers\ProductosController.vb" />
     <Compile Include="Controllers\UsuariosController.vb" />
     <Compile Include="Controllers\API\CategoriasAPIController.vb" />
@@ -205,6 +207,9 @@
     </Compile>
     <Compile Include="Models\CategoriasDTO.vb" />
     <Compile Include="Models\ClienteDTO.vb" />
+    <Compile Include="Models\DetallePedidoDTO.vb" />
+    <Compile Include="Models\EstadoPedidoDTO.vb" />
+    <Compile Include="Models\PedidoDTO.vb" />
     <Compile Include="Models\ProductoDTO.vb" />
     <Compile Include="Models\RolDTO.vb" />
     <Compile Include="Models\UsuarioDTO.vb" />
@@ -358,6 +363,7 @@
     <Content Include="Views\Usuarios\Index.vbhtml" />
     <Content Include="Views\Mesas\Index.vbhtml" />
     <Content Include="Views\Productos\Index.vbhtml" />
+    <Content Include="Views\Pedidos\Index.vbhtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="favicon.ico" />
@@ -401,7 +407,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="p\" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
@@ -409,6 +414,7 @@
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\app\Categorias\categorias.ts" />
     <TypeScriptCompile Include="Scripts\app\Clientes\clientes.ts" />
+    <TypeScriptCompile Include="Scripts\app\Pedidos\pedidos.ts" />
     <TypeScriptCompile Include="Scripts\app\Productos\productos.ts" />
     <TypeScriptCompile Include="Scripts\app\Usuarios\usuarios.ts" />
     <TypeScriptCompile Include="Scripts\app\Mesas\mesas.ts" />

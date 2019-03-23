@@ -6,7 +6,14 @@ namespace Mesas {
     'use strict'
     export class MesasIndexViewModel {
         public mesas: KnockoutObservableArray<any> = ko.observableArray<any>();
+        public tipoForm: KnockoutObservable<any> = ko.observable<any>();
+        public mesaSeleccionada: KnockoutObservable<any> = ko.observable<any>();
+        public pedidoMesa: KnockoutObservable<any> = ko.observable<any>();
+        public idMesa: KnockoutObservable<any> = ko.observable<any>();
+        public startMesa: KnockoutObservable<any> = ko.observable<any>(1);
         public enable: KnockoutObservable<boolean> = ko.observable(true);
+        public disableMod: KnockoutObservable<boolean> = ko.observable(true);
+        public disableCreate: KnockoutObservable<boolean> = ko.observable(true);
         public tipoEstados: KnockoutObservableArray<any> = ko.observableArray<any>();
         public idRowIndex: KnockoutObservable<number> = ko.observable(-1);
         public idRow: KnockoutObservable<number> = ko.observable(0);
@@ -18,6 +25,11 @@ namespace Mesas {
             formData.NumMesa = "";
             formData.Capacidad = "";
             formData.Estado = "";
+            let formModifData: any = $('#form-modif-mesas').dxForm('option').formData;
+            formModifData.ID = 0;
+            formModifData.NumMesa = "";
+            formModifData.Capacidad = "";
+            formModifData.Estado = "";
         };
 
         getMesas(): void {
@@ -32,7 +44,8 @@ namespace Mesas {
                         ID: data[i].id,
                         NumMesa: data[i].numMesa,
                         Capacidad: data[i].capacidad,
-                        Estado: data[i].estado
+                        Estado: data[i].estado,
+                        EstadoStr: data[i].estadoStr
                     });
                 }
             }).fail((data: any) => {
@@ -42,7 +55,13 @@ namespace Mesas {
 
         addMesas(): void {
 
-            let formData: any = $('#form-mesas').dxForm('option').formData;
+            if (this.tipoForm() == "add") {
+                var formData: any = $('#form-mesas').dxForm('option').formData;
+            }
+
+            if (this.tipoForm() == "modif") {
+                var formData: any = $('#form-modif-mesas').dxForm('option').formData;
+            }
 
             if (formData.NumMesa == "" || formData.NumMesa == null || formData.NumMesa == undefined) {
                 DevExpress.ui.notify("No se puede crear número de mesa, falta número", "error", 3000);
@@ -54,11 +73,6 @@ namespace Mesas {
                 return;
             }
 
-            if (formData.Estado === "" || formData.Capacidad === null || formData.Capacidad === undefined) {
-                DevExpress.ui.notify("No se puede crear estado, falta estado", "error", 3000);
-                return;
-            }
-
             let url = 'api/mesas';
             $.ajax({
                 type: 'POST',
@@ -67,13 +81,17 @@ namespace Mesas {
                     ID: formData.ID,
                     NumMesa: formData.NumMesa,
                     Capacidad: formData.Capacidad,
-                    Estado: formData.Estado,
+                    Estado: 1,
                  }
             }).done((data: any) => {
                 DevExpress.ui.notify("Datos guardados correctamente.", "success", 2000);
                 $('#form-mesas').dxForm('instance').resetValues();
+                $('#form-modif-mesas').dxForm('instance').resetValues();
+                this.tipoForm([])
                 this.getMesas();
                 this.limpiar();
+                $('#form-modif-mesas').dxForm('instance').repaint();
+                $('#form-delete-mesas').dxForm('instance').repaint();
                 this.enable(true);           
             }).fail((data: any) => {
                 DevExpress.ui.notify(data.responseJSON, "error", 3000);
@@ -88,7 +106,8 @@ namespace Mesas {
             }).done((data: any) => {
                 $('#form-mesas').dxForm('instance').resetValues();
                 this.getMesas();
-                this.limpiar();
+                $('#form-modif-mesas').dxForm('instance').repaint();
+                $('#form-delete-mesas').dxForm('instance').repaint();
                 this.enable(true);
                 DevExpress.ui.notify("Mesa eliminada satisfactoriamente", "success", 3000);
             }).fail((data: any) => {
@@ -107,6 +126,9 @@ namespace Mesas {
                     });
                 }
             });
+            window.localStorage.removeItem('idmesa');
+            window.localStorage.removeItem('idpedido');
+            window.localStorage.removeItem('nummesa');
         }
 
         formOptions: any = {
@@ -114,7 +136,7 @@ namespace Mesas {
             labelLocation: "top",
             items: [{
                 itemType: "group",
-                colCount: 3,
+                colCount: 1,
                 items: [{
                     dataField: "NumMesa",
                     editorType: "dxTextBox",
@@ -122,21 +144,100 @@ namespace Mesas {
                         showClearButton: true
                     }
                 }, {
-                    dataField: "Capacidad",
+                    itemType: "group",
+                    colCount: 1,
+                    items: [{
+                        dataField: "Capacidad",
+                        editorType: "dxNumberBox",
+                        colSpan: 1,
+                        editorOptions: {
+                            showSpinButtons: true,
+                            min: 0
+                        }
+                    }]
+                }]
+            }]
+        };
+
+        formModifOptions: any = {
+            formData: this.mesas,
+            labelLocation: "top",
+            items: [{
+                itemType: "group",
+                colCount: 1,
+                items: [{
+                    editorType: "dxSelectBox",
+                    label: { text: 'Seleccionar mesa' },
+                    editorOptions: {
+                        dataSource: this.mesas,
+                        placeholder: "Seleccionar...",
+                        displayExpr: 'NumMesa',
+                        onItemClick: (e) => {
+                            let mesaData: any = {
+                                ID: e.itemData.ID,
+                                NumMesa: e.itemData.NumMesa,
+                                Capacidad: e.itemData.Capacidad,
+                                Estado: e.itemData.Estado
+                            }
+                            let formData: any = $('#form-modif-mesas').dxForm('option');
+                            formData.formData = mesaData;
+                            let form = $('#form-modif-mesas').dxForm('instance');
+                            form.repaint();
+                            this.enable(false);
+                        }
+                    }
+                }, {
+                    dataField: "NumMesa",
                     editorType: "dxTextBox",
+                    label: { text: 'Nombre Mesa' },
                     editorOptions: {
                         showClearButton: true
                     }
                 }, {
-                    dataField: "Estado",
-                    editorType: "dxSelectBox",
-                    editorOptions: {
-                        dataSource: this.tipoEstados,
-                        placeholder: "Seleccionar...",
-                        displayExpr: 'Nombre',
-                        valueExpr: 'Clave'
-                     }
+                    itemType: "group",
+                    colCount: 3,
+                    items: [{
+                        dataField: "Capacidad",
+                        editorType: "dxNumberBox",
+                        colSpan: 1,
+                        editorOptions: {
+                            showSpinButtons: true,
+                            min: 0
+                        }
+                    }, {
+                        dataField: "Estado",
+                        editorType: "dxSelectBox",
+                        colSpan: 2,
+                        disabled: true,
+                        editorOptions: {
+                            dataSource: this.tipoEstados,
+                            placeholder: "Seleccionar...",
+                            displayExpr: 'Nombre',
+                            valueExpr: 'Clave'
+                        }
+                    }]
                 }]
+            }]
+        };
+
+        formDeleteOptions: any = {
+            formData: this.mesas,
+            labelLocation: "top",
+            itemType: "group",
+            colCount: 1,
+            items: [{
+                dataField: "ID",
+                editorType: "dxSelectBox",
+                label: { text: 'Seleccionar mesa a eliminar' },
+                editorOptions: {
+                    dataSource: this.mesas,
+                    placeholder: "Seleccionar...",
+                    displayExpr: 'NumMesa',
+                    valueExpr: 'ID',
+                    onItemClick: (e) => {
+                        this.enable(false);
+                    }
+                }
             }]
         };
 
@@ -145,7 +246,6 @@ namespace Mesas {
             dataSource: this.mesas,
             noDataText: 'No hay datos disponibles por el momento ...',
             showScrollbar: true,
-            items: Mesas,
             height: 400,
             baseItemHeight: 120,
             baseItemWidth: 185,
@@ -161,20 +261,122 @@ namespace Mesas {
                     + "<img src='" + encodeURI(url) + "' width='183' height='80' class='img- thumbnail'/>");
              },
             onItemClick: (e) => {
-                this.enable(false);
-                let mesaData: any = {
-                    ID: e.itemData.ID,
-                    NumMesa: e.itemData.NumMesa,
-                    Capacidad: e.itemData.Capacidad,
-                    Estado: e.itemData.Estado
-                }
+                this.disableMod(true);
+                this.disableCreate(true);
+                this.pedidoMesa([]);
+                let url = 'api/pedidos/' + e.itemData.ID;
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                }).done((data: any) => {
+                    if (e.itemData.NumMesa == 'Domicilio') {
+                        data[0] = undefined;
+                    }
+
+                    if (data[0] !== undefined) {
+                        this.disableMod(false);
+                    } else {
+                        this.disableCreate(false);
+                    }
+
+                    let mesaData: any = {
+                        ID: e.itemData.ID,
+                        NumMesa: e.itemData.NumMesa,
+                        Capacidad: e.itemData.Capacidad,
+                        Estado: e.itemData.Estado,
+                        EstadoStr: e.itemData.EstadoStr
+                    }
+                    this.mesaSeleccionada(mesaData);
+                    var mesa = {},
+                        popup = null,
+                        popupOptions = {
+                            visible: false,
+                            width: "400",
+                            height: "auto",
+                            position: {
+                                my: 'center',
+                                at: 'center',
+                                of: window
+                            },
+                            dragEnabled: true,
+                            closeOnOutsideClick: true,
+                            showTitle: true,
+                            contentTemplate: function () {
+                                if (data[0] !== undefined) {
+                                    return $("<div />").css("padding", "20px").append(
+                                        $("<p><b>Nombre Mesa:</b> <span>" + mesaData.NumMesa + "</span></p>"),
+                                        $("<p><b>Capacidad:</b> <span>" + mesaData.Capacidad + "</span></p>"),
+                                        $("<p><b>Estado Mesa:</b> <span>" + mesaData.EstadoStr + "</span></p>"),
+                                        $("<hr>").css("border-top", "1px dotted #8c8b8b"),
+                                        $("<div />").css("background-color", "rgba(191, 191, 191, 0.15)").css("padding","20px").append(
+                                            $("<p><b>Nombre Cliente:</b> <span>" + data[0].nombreComprador + "</span></p>"),
+                                            $("<p><b>Nombre Vendedor:</b> <span>" + data[0].vendedor.nombre + " " + data[0].vendedor.apellido + "</span></p>"),
+                                            $("<p><b>Fecha:</b> <span>" + new Date(data[0].fecha).toLocaleString() + "</span></p>"),
+                                            $("<p><b>Estado Pedido:</b> <span>" + data[0].estadoPedidoStr + "</span></p>"),
+                                            $("<p><b>N° Personas:</b> <span>" + data[0].nroPersonas + "</span></p>"),
+                                            $("<p><b>Observaciones:</b> <span>" + data[0].observaciones + "</span></p>"),
+                                       )
+                                    );
+                                } else {
+                                    return $("<div />").append(
+                                        $("<p><b>Nombre Mesa:</b> <span>" + mesaData.NumMesa + "</span></p>"),
+                                        $("<p><b>Capacidad:</b> <span>" + mesaData.Capacidad + "</span></p>"),
+                                        $("<p><b>Estado:</b> <span>" + mesaData.EstadoStr + "</span></p>"),
+                                        $("<hr>").css("border-top", "1px dotted #8c8b8b"),
+                                        $("<h4>No existe pedido</h4>").css("text-align","center").css("margin-top","10px")
+                                    );
+                                }
+                            },
+                            toolbarItems: [{
+                                toolbar: 'top',
+                                text: "Información de mesa",
+                                location: "center"
+                            }, {    
+                                widget: "dxButton",
+                                toolbar: 'bottom',
+                                location: "after",
+                                options: {
+                                    text: "Añadir Pedido",
+                                    icon: "plus",
+                                    disabled: this.disableCreate,
+                                    type: 'success',
+                                    onClick: () => {
+                                        window.localStorage.setItem('idmesa', e.itemData.ID);
+                                        window.localStorage.setItem('nummesa', e.itemData.NumMesa);
+                                        window.location.replace(window.location.origin + '/Pedidos');
+                                    }
+                                }
+                            }, {
+                                widget: "dxButton",
+                                toolbar: 'bottom',
+                                location: "before",
+                                options: {
+                                    text: "Modificar Pedido",
+                                    icon: "edit",
+                                    disabled: this.disableMod,
+                                    type: 'default',
+                                    onClick: () => {
+                                        window.localStorage.setItem('idmesa', e.itemData.ID);
+                                        window.localStorage.setItem('idpedido', data[0].id);
+                                        window.location.replace(window.location.origin + '/Pedidos');
+                                    }
+                                }
+                            }]
+                        };
+
+                    if (popup) {
+                        $(".form-info-popup").remove();
+                    }
+                    var $popupContainer = $("<div />")
+                        .addClass("form-info-popup")
+                        .appendTo($("#form-info-popup"));
+                    popup = $popupContainer.dxPopup(popupOptions).dxPopup("instance");
+                    popup.show();
+                }).fail((data: any) => {
+                    DevExpress.ui.notify(data.responseJSON, "error", 3000);
+                });
+
                 
-                let formData: any = $('#form-mesas').dxForm('option');
-                formData.formData = mesaData;
-                this.idRow(mesaData.ID);
-                this.idRowIndex(e.rowIndex);
-                let form = $('#form-mesas').dxForm('instance');
-                form.repaint();
             },
             onItemRendered: (e) => {
                 let mesaData: any = {
@@ -184,36 +386,22 @@ namespace Mesas {
                     Estado: e.itemData.Estado
                 }
                 if (mesaData.Estado === 0) {
-                    e.itemElement.css("background-color", "yellow");
+                    e.itemElement.css("background-color", "OrangeRed");
                 }
                 if (mesaData.Estado === 1) {
                     e.itemElement.css("background-color", "MediumSeaGreen");
                 }
                 if (mesaData.Estado === 2) {
-                    e.itemElement.css("background-color", "OrangeRed");
+                    e.itemElement.css("background-color", "yellow");
                 }
             }
                      
          };
 
-        buttonOptionsDelete: any = {
-            text: "Borrar",
-            icon: "trash",
-            type: 'danger',
-            disabled: this.enable,
-            onClick: () => {
-                let index = this.idRow();
-                this.deleteMesas(index);
-                $('#tileview').dxTileView('instance').repaint();
-
-
-            }
-        }
-
         formPopup: any = {
             visible: false,
-            width: 500,
-            height: 510,
+            width: "300",
+            height: "auto",
             position: {
                 my: 'center',
                 at: 'center',
@@ -226,7 +414,7 @@ namespace Mesas {
             },
             toolbarItems: [{
                 toolbar: 'top',
-                text: "Añadir mesas",
+                text: "Añadir mesa",
                 location: "center"
             }, {
                 widget: "dxButton",
@@ -237,6 +425,7 @@ namespace Mesas {
                     icon: "plus",
                     type: 'success',
                     onClick: () => {
+                        this.tipoForm("add");
                         this.addMesas();
                         let popForm = $('#form-popup').dxPopup('instance');
                         popForm.hide();
@@ -245,8 +434,82 @@ namespace Mesas {
             }]
         };
 
+        formModifPopup: any = {
+            visible: false,
+            width: "300",
+            height: "auto",
+            position: {
+                my: 'center',
+                at: 'center',
+                of: window
+            },
+            dragEnabled: true,
+            closeOnOutsideClick: true,
+            contentTemplate: (e) => {
+                return $('#form-modif-mesas')
+            },
+            toolbarItems: [{
+                toolbar: 'top',
+                text: "Modificar mesa",
+                location: "center"
+            }, {
+                widget: "dxButton",
+                toolbar: 'bottom',
+                location: "after",
+                options: {
+                    text: "Modificar",
+                    icon: "edit",
+                    type: 'default',
+                    disabled: this.enable,
+                    onClick: () => {
+                        this.tipoForm("modif");
+                        this.addMesas();
+                        let popForm = $('#form-modif-popup').dxPopup('instance');
+                        popForm.hide();
+                    }
+                }
+            }]
+        };
+
+        formDeletePopup: any = {
+            visible: false,
+            width: "300",
+            height: "auto",
+            position: {
+                my: 'center',
+                at: 'center',
+                of: window
+            },
+            dragEnabled: true,
+            closeOnOutsideClick: true,
+            contentTemplate: (e) => {
+                return $('#form-delete-mesas')
+            },
+            toolbarItems: [{
+                toolbar: 'top',
+                text: "Eliminar mesa",
+                location: "center"
+            }, {
+                widget: "dxButton",
+                toolbar: 'bottom',
+                location: "after",
+                options: {
+                    text: "Eliminar",
+                    icon: "trash",
+                    type: 'danger',
+                    disabled: this.enable,
+                    onClick: () => {
+                        let formData: any = $('#form-delete-mesas').dxForm('option').formData;
+                        this.deleteMesas(formData.ID);
+                        let popForm = $('#form-delete-popup').dxPopup('instance');
+                        popForm.hide();
+                    }
+                }
+            }]
+        };
+
         addPopup: any = {
-            text: "Agregar",
+            text: "Agregar Mesa",
             icon: "plus",
             type: 'success',
             onClick: (e) => {
@@ -259,13 +522,27 @@ namespace Mesas {
             }
         }
 
+        deletePopup: any = {
+            text: "Eliminar Mesa",
+            icon: "trash",
+            type: 'danger',
+            onClick: () => {
+                $('#form-delete-mesas').dxForm('instance').resetValues();
+                this.enable(true);
+                let popForm = $('#form-delete-popup').dxPopup('instance');
+                popForm.show();
+            }
+        }
+
         modifPopup: any = {
-            text: "Modificar",
+            text: "Modificar Mesa",
             icon: "edit",
             type: 'default',
-            disabled: this.enable,
             onClick: (e) => {
-                let popForm = $('#form-popup').dxPopup('instance');
+                $('#form-modif-mesas').dxForm('instance').resetValues();
+                this.limpiar();
+                this.enable(true);
+                let popForm = $('#form-modif-popup').dxPopup('instance');
                 popForm.show();
             }
         }

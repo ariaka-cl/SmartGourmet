@@ -134,7 +134,8 @@ namespace Clientes {
                     editorType: "dxNumberBox",
                     editorOptions: {
                         label: "Teléfono",
-                        showClearButton: true
+                        showClearButton: true,
+                        mode: "tel"
                     }
                 }]
             }]
