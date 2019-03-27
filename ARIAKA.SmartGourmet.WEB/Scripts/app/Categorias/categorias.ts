@@ -12,6 +12,7 @@ namespace Categorias {
         public idRowIndex: KnockoutObservable<number> = ko.observable(-1);
         public nombre: KnockoutObservable<String> = ko.observable("");
         public fecha: KnockoutObservable<any> = ko.observable<any>(null);	
+
         public limpiar() {
             let formData: any = $('#text-nombre').dxTextBox('option').value;
             formData = "";
@@ -20,7 +21,6 @@ namespace Categorias {
           
         getCategoria(): void {
             this.categorias([]);
-            //this.fecha();
             $.ajax({
                 type: 'GET',
                 url: 'api/categorias',

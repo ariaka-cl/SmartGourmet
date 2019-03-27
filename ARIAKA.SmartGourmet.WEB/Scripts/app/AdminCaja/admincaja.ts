@@ -59,12 +59,11 @@ namespace AdminCaja {
             });
         }
 
-        addCaja(): void {
-           // let formData: any = $('#text-nombre').dxTextBox('option').value;
-
+        AbrirCaja(): void {
+                           
             $.ajax({
-                type: 'POST',
-                url: 'api/admincaja',
+                type: 'GET',
+                url: 'api/admincaja/abrir-caja',
                 data: {
                     ID: this.idRow,
                     Turno: this.turno,
@@ -75,6 +74,7 @@ namespace AdminCaja {
                     DevExpress.ui.notify("Datos Guardados Satisfactoriamente", "success", 2000);
                     //$('#text-nombre').dxTextBox('instance').repaint();
                 }
+
             })
             //    .done((result) => {
             //    this.getCaja();
@@ -105,14 +105,24 @@ namespace AdminCaja {
                 dataField: 'FechaInicio',
                 dataType: 'date',
                 format: 'dd/MM/YY HH:mm'
-            }],
+             }],
+            filterRow: {
+                visible: true,
+                showOperationChooser: true,
+                applyFilter: "auto"
+            },
+            searchPanel: {
+                visible: true,
+                width: 240,
+                placeholder: "Buscar..."
+            },
             onRowClick: (e) => {
                 this.enable(false);
                 let cajaData: any = {
                     ID: e.data.ID,
                     Turno: e.data.Turno,
                     FechaInicio: e.data.FechaInicio,
-                    SaldoInicial: e.data.SandoInicial
+                    SaldoInicial: e.data.SaldoInicial
                 }
                 this.idRow(cajaData.ID);
                 this.idRowIndex(e.rowIndex);
@@ -140,7 +150,17 @@ namespace AdminCaja {
             {
                 dataField: 'TipoPago',
                 caption: 'Tipo Pago'
-            }]
+            }],
+            filterRow: {
+                visible: true,
+                showOperationChooser: true,
+                applyFilter: "auto"
+            },
+            searchPanel: {
+                visible: true,
+                width: 240,
+                placeholder: "Buscar..."
+            },
         }
 
         botonAbrirTurno: any = {
@@ -148,7 +168,7 @@ namespace AdminCaja {
             icon: "glyphicon glyphicon-play-circle",
             type: 'success',
             onClick: () => {
-                this.addCaja();
+                this.AbrirCaja();
             }
         }
 
